@@ -1,0 +1,6 @@
+{
+    "require": {      
+        "laudis/neo4j-php-client":">=1.0",
+        "phpoffice/phpspreadsheet": "^1.23"
+    }
+}

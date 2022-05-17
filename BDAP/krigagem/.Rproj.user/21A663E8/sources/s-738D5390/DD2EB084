@@ -1,0 +1,25 @@
+{
+    "id": "DD2EB084",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1615852076309.0,
+    "source_on_save": false,
+    "relative_order": 10,
+    "properties": {
+        "id": "0b68e96ad4a741d4bb4b065c31f8eb92",
+        "name": "test.model",
+        "title": "test.model"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1615846319,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1615852076309,
+    "read_only": false,
+    "read_only_alternatives": []
+}

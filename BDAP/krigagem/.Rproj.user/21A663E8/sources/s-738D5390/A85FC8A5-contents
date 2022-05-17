@@ -1,0 +1,100 @@
+## 
+## Interactive demonstration of the Variogram / Kriging procedure
+##
+{
+  liste.initiale = ls()
+  on.exit(demo.clean(liste.initiale))
+  par(ask=FALSE)
+  
+  # Loading Data #
+  xloc1 <- eval(parse(text=readline(prompt="Vector for first coordinate (default: randomly generated data set) = ")))
+  if (length(xloc1) > 0)
+    xloc2 <- eval(parse(text=readline(prompt="Vector for second coordinate = ")))
+  if (length(xloc1) > 0 && length(xloc2) > 0)
+    zloc1 <- eval(parse(text=readline(prompt="Vector for target variable = ")))
+  
+  if (length(xloc1) <= 0 || length(xloc2) <= 0 || length(zloc1) <= 0)
+  {
+    number = get.num("Number of samples",default=100,minimum=10,maximum=500)
+    model  = model.create("Cubic",range=20,sill=2)
+    xloc1  = 100 * runif(number)
+    xloc2  = 100 * runif(number)
+    db     = db.create(x1=xloc1,x2=xloc2)
+    db     = simtub(,db,model)
+    zloc1  = db[,4]
+    rm(model,db)
+  }
+  
+  xloc2 = k$V1
+  xloc1 = k$V2
+  zloc1 = k$V4
+  # Check compatible dimensions #
+  if (length(xloc1) != length(xloc2) || length(xloc1) != length(zloc1))
+    stop("All vectors should have the same dimension")
+  
+  # Ask for the auxiliary parameters #
+  ncell <- get.num("Number of cells for kriging grid",
+                   default=50,minimum=1,maximum=100)
+  nlag  <- get.num("Number of variogram lags",
+                   default=10,minimum=2,maximum=100)
+  ndir  <- get.num("Number of variogram directions",
+                   default=4,minimum=1,maximum=4)
+  ang0  <- get.num("Reference direction",
+                   default=0,minimum=0,maximum=180)
+  
+  # Creating the Data DB #
+  rx1  <- extendrange(xloc1)
+  rx2  <- extendrange(xloc2)
+  db.data <- db.create(x1=xloc1,x2=xloc2,z1=zloc1)
+  
+  # Creating the grid DB #
+  ext1 <- rx1[2] - rx1[1]
+  ext2 <- rx2[2] - rx2[1]
+  diam <- sqrt(ext1 * ext1 + ext2 * ext2)
+  db.grid <- db.create(flag.grid=TRUE,x0=c(rx1[1],rx2[1]),
+                       nx=c(ncell,ncell),dx=c(ext1/ncell,ext2/ncell))
+  
+  # Creating the neighborhood #
+  test.neigh <- neigh.create(ndim=2,type=0)
+  
+  dirvect <- (seq(1,ndir)-1) * 180 / ndir + ang0
+  
+  # Calcula o variograma experimental e o ajuste autom?tico
+  test.vario <- vario.calc(db.data,dirvect=dirvect,lag=diam/(2*nlag),nlag=nlag)
+  test.model <- model.auto(test.vario,draw=FALSE)
+  
+  # Executa o Kriging
+  db.grid <- kriging(db.data,db.grid,test.model,test.neigh)
+  
+  # Split the page in 4 pieces #
+  split.screen(c(2,2),erase=TRUE)
+  
+  # Plot the information #
+  screen(1)
+  plot(db.data,reset=FALSE,title="Data")
+  
+  # Plot the variogram and the model #
+  screen(2)
+  plot(test.vario,reset=FALSE,title="Variogram Model")
+  plot(test.model,add=T)
+  
+  # Plot the Estimation map #
+  screen(3)
+  plot(db.grid,name.image="Kriging.z1.estim",title="Estimation",reset=FALSE)
+  plot(db.data,name.post="z1",col="blue",pch=21,add=TRUE)
+  
+  # Plot the Standard deviation map #
+  screen(4)
+  plot(db.grid,name.image="Kriging.z1.stdev",title="St. Deviation",reset=FALSE)
+  plot(db.data,name.post="z1",col="blue",pch=21,add=TRUE)
+  
+  db.write.format(db.grid, mode="csv", file=NA, name=NA, must.noproj=TRUE,
+                  nsamplex=1, nsampley=1, nmult=1, flag.low=0, flag.high=1,
+                  valmin=NA, valmax=NA, append=FALSE,
+                  ncolor=NA, red=NA, green=NA, blue=NA,
+                  mask_red=  0, mask_green=  0, mask_blue=  0,
+                  ffff_red=232, ffff_green=232, ffff_blue=  0,
+                  low_red =255, low_green =255, low_blue =255,
+                  high_red=255, high_green=  0, high_blue=  0,
+                  sep=",",dec=".", colors=rg.colors(), colorscale.file=NA,
+                  na.value=-99999999999)

@@ -1,0 +1,80 @@
+##krigagem.r -> Recebe os parâmetros e calcula a krigagem
+library(RGeostats)
+library(stringr)
+
+## Recebimento de parâmetros
+args <- commandArgs(TRUE)     
+tx <- args[1]    
+ty <- args[2]
+tv <- args[3]
+ncell <- as.integer(args[4])
+nlag <- as.integer(args[5])
+ndir <- as.integer(args[6])
+ang <- as.integer(args[7])
+
+## transformar string recebida em vetores de números x, y e v
+tx<-str_split(tx,',')
+ty<-str_split(ty,',')
+tv<-str_split(tv,',')
+
+xloc1<- c()
+xloc2<- c()
+zloc1<- c()
+
+for (i in 1:length(tx)){
+  n <- as.double(tx[[i]])
+  xloc1<-c(xloc1, n)
+}
+
+for (i in 1:length(ty)){
+  n <- as.double(ty[[i]])
+  xloc2<-c(xloc2, n)
+}
+
+for (i in 1:length(tv)){
+  n <- as.double(tv[[i]])
+  zloc1<-c(zloc1, n)
+}
+
+#Criação db com os dados
+rx1  <- extendrange(xloc1)
+rx2  <- extendrange(xloc2)
+db.data <- db.create(x1=xloc1,x2=xloc2,z1=zloc1)
+
+#Criação grid que irá receber os dados
+ext1 <- rx1[2] - rx1[1]
+ext2 <- rx2[2] - rx2[1]
+diam <- sqrt(ext1 * ext1 + ext2 * ext2)
+db.grid <- db.create(flag.grid=TRUE,x0=c(rx1[1],rx2[1]),
+                     nx=c(ncell,ncell),dx=c(ext1/ncell,ext2/ncell))
+
+#Criação da vizinhança
+test.neigh <- neigh.create(ndim=2,type=0)
+
+dirvect <- (seq(1,ndir)-1) * 180 / ndir + ang0
+
+# Calcula o variograma experimental e o ajuste automático
+test.vario <- vario.calc(db.data,dirvect=dirvect,lag=diam/(2*nlag),nlag=nlag)
+test.model <- model.auto(test.vario,draw=FALSE)
+
+# Executa o Kriging
+db.grid <- kriging(db.data,db.grid,test.model,test.neigh)
+
+
+#Gera imagens para apresentar
+
+#Variograma
+png(filename="variograma.png", width=600, height=400)
+plot(test.vario,reset=FALSE,title="Variogram Model")
+plot(test.model,add=T)
+dev.off()
+
+png(filename="estimativa.png", width=600, height=400)
+plot(db.grid,name.image="Kriging.z1.estim",title="Estimation",reset=FALSE)
+plot(db.data,name.post="z1",col="blue",pch=21,add=TRUE)
+dev.off()
+
+png(filename="variograma.png", width=600, height=400)
+plot(test.vario,reset=FALSE,title="Variogram Model")
+plot(test.model,add=T)
+dev.off()
