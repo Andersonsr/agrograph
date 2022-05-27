@@ -4,12 +4,6 @@ include '../connect.php';
 include_once '../sessioncheck.php';
 require_once '../../composer/vendor/autoload.php';
 
-// echo "<pre>";
-// print_r($_POST);
-// print_r($_FILES);
-// echo "</pre>";
-// print_r($_SESSION);
-
 $expressaoDataBR = "/(([^0-9][1-9][^0-9])|(0[1-9])|([1-2][0-9])|(3[0-1]))[-\/](([1-9])|(1[0-2]))[-\/](([0-9]{4})|([0-9]{2}))/";
 $expressaoDataUS = "/((0[1-9])|(1[0-2])|^[1-9])[-\/](([^0-9][1-9][^0-9])|(0[1-9])|([1-2][0-9])|(3[0-1]))[-\/](([0-9]{4})|([0-9]{2}))/";
 $expressaoAnoAntes = "/((19[7-9][0-9])|(20[0-6][0-9])[-\/](([1-9][^0-9])|(1[0-2]))[-\/](([1-9]$)|([1-2][0-9])|(3[0-1])|(0[1-9])))/";
@@ -24,11 +18,9 @@ $formato = $_POST['formato'];
 $latitude = -1;
 $longitude = -1;
 $erro = false;
-// echo "<p>$filename</p>";
 
 $fileType = ucfirst(explode('.', $filename)[1]);
 $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($fileType);
-// echo "$fileType";
 
 $spreadsheet = $reader->load($filename);
 $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, false);
@@ -39,8 +31,6 @@ if (!empty($sheetData)) {
 		//data fixa para todo o arquivo executa uma vez
 		//verifica se ja existe no para a data atual
 		$query = "MATCH (d:Data) WHERE d.data = '$date' RETURN d";
-		// echo"<p>cia data</p>";
-		// echo"<p>$query</p>";
 		$result = $client->run($query);		
 		
 		if (!count($result)){
@@ -55,34 +45,25 @@ if (!empty($sheetData)) {
 	$row = 1;
 	foreach ($sheetData as $data) { //percorre arquivo csv linha a linha
 		$num = count($data);
-		// echo "<p>linha $row: ";
-		// print_r($data);
-		// echo"</p>";
 		if($row == 1){
 			//executa uma vez
 			for ($counter = 0; $counter < $num; $counter++){
 				$campo = "campo" . $counter;
 				$medida = "medida" . $counter;
-				// echo $campo;
-				// echo $medida;
 				$arraycampo[] = $_POST[$campo];
 				$arraymedida[] = $_POST[$medida];
 			
 				if(preg_match("/latitude/i", $_POST[$campo])>0){
 					$latitude = $counter;
-					// echo "<p>achou latitude</p>";
 				}
 				else if(preg_match("/longitude/i", $_POST[$campo])>0){
 					$longitude = $counter;
-					// echo "<p>achou longitude</p>";
 				}
 				else if(preg_match("/data|date|dia|day/i", $_POST[$campo])>0){
 					$indiceData = $counter;
-					// echo "<p>achou data</p>";
 				}
 				else if(preg_match("/hora|horario|horário|time/i", $_POST[$campo])>0){
 					$indiceHora = $counter;
-					// echo "<p>achou horario</p>";
 				}
 				
 			}
@@ -100,17 +81,13 @@ if (!empty($sheetData)) {
 			if(is_numeric($longitudebd) && is_numeric($latitudebd)){
 				//verifica se ja existe a localizacao no db
 				$query = "MATCH (l:Localizacao) WHERE l.latitude = $latitudebd AND l.longitude = $longitudebd RETURN l";
-				// echo "<p>$query</p>";
 				$result = $client->run($query);		
-				// echo "<p>$result</p>";
 				
 				//se nao existe insere a localizacao no db
 				if (!count($result)){
 					$query = "CREATE (l:Localizacao {latitude:$latitudebd, longitude:$longitudebd})"
 							." WITH l CALL spatial.addNode('layer',l) YIELD node RETURN node";
 		
-					// echo"<p>criou local</p>";	
-					// echo "<p>$query</p>";
 					$result = $client->run($query);
 					
 				}
@@ -127,7 +104,6 @@ if (!empty($sheetData)) {
 							$query .= "AND v.unidadeMedida = '$medidabd' ";
 						}
 						$query .= "RETURN v";
-						// echo "<p>$query</p>";
 						$result = $client->run($query);
 						
 						//se nao existe insere no db
@@ -208,12 +184,10 @@ if (!empty($sheetData)) {
 							}
 															
 							$query = "MATCH (d:Data) WHERE d.data = '$date' RETURN id(d)";
-							// echo "<p>$query</p>";
 							$result = $client->run($query);			
 							//cria no para a data caso nao exista
 							if (!count($result)){
 								$query="CREATE (d:Data {data: '$date'}) RETURN d";
-								// echo "<p>$query</p>";
 								$result = $client->run($query);
 								// echo "criou data";
 							}	
@@ -271,7 +245,7 @@ if (!empty($sheetData)) {
 		
 		$row++;
 	}
-	// echo"</pre>";	
+	unlink($filename);	
 	if(!$erro){
 		header("location:armazenardados.php?insert");
 	}

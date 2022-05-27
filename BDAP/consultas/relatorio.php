@@ -16,10 +16,7 @@
 <?php
     include_once '../sessioncheck.php';
 	include_once '../connect.php';
-	// echo "<pre>";
-    // print_r($_POST);
-    // print_r($_SESSION['query']);
-    // echo "</pre>";
+	
 	$result = $client->run($_SESSION['query']);
 
 

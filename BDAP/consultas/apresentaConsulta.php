@@ -31,15 +31,8 @@ var markers = [];
 $email = $_SESSION["email"];
 
 if(isset($_GET['filtros'])){
-	// echo "<pre>";
-	// echo "<p>tem filtros</p>";
-	// print_r($_POST);
 	$queryOriginal = $_SESSION['queryOriginal'];
-	// echo $queryOriginal;
-	// echo "</pre>";
 	$partes=explode('WHERE', $queryOriginal);
-	
-	//print_r ($partes);
 	
 	$where = "WHERE v.tipo='". $_POST['variaveis']."' AND v.valor".$_POST['operadores'].$_POST['valor']; 
 		//echo $where."<br>";
@@ -54,7 +47,6 @@ if(isset($_GET['filtros'])){
 		$query .= ":Localizacao";
 	}	
 	$query .= ") WHERE ".$partes[2];
-	// $query .= ' RETURN node.latitude, node.longitude, v.tipo, v.valor, d.data ORDER BY node.latitude, node.longitude, v.tipo, d.data';
 	
 }
 else{
@@ -138,7 +130,6 @@ $conteudo = '';
 foreach($result as $r){
 	$latbd = $r->get('node.latitude');
 	$longbd = $r->get('node.longitude');
-	// echo"<p>checkpoint 1.1</p>";
 
 	if ($latbd != end($lat) AND $longbd != end($lot)){
 		array_push($lat, $latbd);
@@ -165,11 +156,8 @@ foreach($result as $r){
 		$conteudo.= ') </br>';
 		array_push($cont, $conteudo);
 	}
-	// echo"<p>checkpoint 1.2</p>";
 
 }
-// echo"<p>checkpoint 2</p>";
-
 for($i = 0; $i < count($lat); $i++){
     echo "
 	<script>
@@ -214,7 +202,7 @@ for($i = 0; $i < count($lat); $i++){
 jQuery(function($) {
     // Asynchronously Load the map API 
     var script = document.createElement('script');
-    script.src = "//maps.googleapis.com/maps/api/js?sensor=false&callback=initialize&key=".$_SERVER['HTTP_API_KEY'];
+    script.src = "//maps.googleapis.com/maps/api/js?sensor=false&callback=initialize&key=AIzaSyDOj5QYd5pTb8_Y2Qf-tEXWn78Tvnf_ggE";
     document.body.appendChild(script);
 });
 
@@ -379,7 +367,6 @@ $(document).ready(function(){
 
 																								
 												foreach($resultvar as $rvar){
-													
 													$t = $rvar->get('v.tipo');
 													
 													echo '<option value="'.$t.'"/>'.$t.'</option>';

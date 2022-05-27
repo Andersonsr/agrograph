@@ -135,6 +135,8 @@ function validateForm() {
                                             $parts = explode('.', $_FILES['arquivo']['name']);
                                             $fileName = hash('sha256', $_FILES['arquivo']['name']).'.'.$parts[1];
                                             $fileType = ucfirst($parts[1]);
+                                            // print_r($_FILES);
+                                            // echo $fileName;
 
                                             if(!move_uploaded_file($_FILES['arquivo']['tmp_name'], $fileName))
                                                 echo "Erro ao submeter arquivo CSV. Por favor tente novamente.";

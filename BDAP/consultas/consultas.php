@@ -55,7 +55,7 @@
 jQuery(function($) {
     // Asynchronously Load the map API 
     var script = document.createElement('script');
-    script.src = "//maps.googleapis.com/maps/api/js?sensor=false&callback=initialize&key=".$_SERVER['HTTP_API_KEY'];
+    script.src = "//maps.googleapis.com/maps/api/js?sensor=false&callback=initialize&key=AIzaSyDOj5QYd5pTb8_Y2Qf-tEXWn78Tvnf_ggE";
     document.body.appendChild(script);
 });
 let map;

@@ -15,10 +15,7 @@
  <?php
     include_once '../sessioncheck.php';
     require_once '../../composer/vendor/autoload.php';
-    // echo "<pre>";
-    // print_r($_POST);
-    // print_r($_FILES);
-    // echo "</pre>";
+   
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -125,7 +122,6 @@ function validateForm() {
                                         <div class="col-md-12 pr-1">
                                             <form action="verificaData.php" onsubmit="return validateForm()" method="post" id="formulario" enctype="multipart/form-data">
                                                 <?php
-                                            // print_r($_FILES);
                                             $parts = explode('.', $_FILES['arquivo']['name']);
                                             $fileType = ucfirst($parts[1]);                            
                                             $filename = hash('sha256', $_FILES['arquivo']['name'] ).".".$parts[1];
@@ -134,12 +130,10 @@ function validateForm() {
                                                 echo "Erro ao submeter arquivo CSV. Por favor tente novamente.";
 
                                             $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($fileType);
-                                            // echo "$fileType";
                                             
                                             $spreadsheet = $reader->load($filename);
                                             $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, false);
-                                            // print_r($sheetData);
-
+                                      
                                             if (!empty($sheetData)) {
                                                 $c = 0;
                                                 $indiceData = -1;
