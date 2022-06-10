@@ -84,7 +84,7 @@
 
 <body>
     <div class="wrapper">
-        <div class="sidebar" data-image="../../assets/img/3.png" data-color="green">
+        <div class="sidebar" data-image="../../assets/img/3.png" data-color="darkGreen">
             <div class="sidebar-wrapper">
                 <div class="logo">
                     <a class="simple-text">

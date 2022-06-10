@@ -691,6 +691,18 @@ body > .navbar-collapse[data-color="purple"]:after {
     background-size: 150% 150%;
 }
 
+.sidebar[data-color="darkGreen"]:after,
+body > .navbar-collapse[data-color="darkGreen"]:after {
+    background: #006400;
+    background: -moz-linear-gradient(top, #006400 0%, #008000 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #006400), color-stop(100%, #006400));
+    background: -webkit-linear-gradient(top, #006400 0%, #008000 100%);
+    background: -o-linear-gradient(top, #006400 0%, #008000 100%);
+    background: -ms-linear-gradient(top, #006400 0%, #008000 100%);
+    background: linear-gradient(to bottom, #006400 0%, #008000 100%);
+    background-size: 150% 150%;
+}
+
 .main-panel {
     background: rgba(203, 203, 210, 0.15);
     position: relative;

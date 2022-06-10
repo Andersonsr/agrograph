@@ -63,7 +63,7 @@ function validateForm() {
 </head>
 <body>
     <div class="wrapper">
-        <div class="sidebar" data-image="../../assets/img/3.png" data-color="green">
+        <div class="sidebar" data-image="../../assets/img/3.png" data-color="darkGreen">
             <div class="sidebar-wrapper">
                 <div class="logo">
                     <a class="simple-text">
@@ -243,7 +243,7 @@ function validateForm() {
 <!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
 <script src="../../assets/js/plugins/bootstrap-switch.js"></script>
 <!--  Google Maps Plugin    -->
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQ9J6iIfkrIhxltHODZBAyK1Nyir9bS20"></script>
 <!--  Chartist Plugin  -->
 <script src="../../assets/js/plugins/chartist.min.js"></script>
 <!--  Notifications Plugin    -->

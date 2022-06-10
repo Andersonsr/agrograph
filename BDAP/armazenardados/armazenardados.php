@@ -50,7 +50,7 @@
 </head>
 <body>
     <div class="wrapper">
-        <div class="sidebar" data-image="../../assets/img/3.png" data-color="green">
+        <div class="sidebar" data-image="../../assets/img/3.png" data-color="darkGreen">
             <div class="sidebar-wrapper">
                 <div class="logo">
                     <a class="simple-text">
@@ -153,7 +153,7 @@
                                                 <div class="font-icon-detail">
                                                     <a href="armazenarcsv.php">
                                                         <i class="nc-icon nc-layers-3"></i>
-                                                        <p>Arquivo CSV</p>
+                                                        <p>Arquivo</p>
                                                     </a>
                                                 </div>
                                             </div>

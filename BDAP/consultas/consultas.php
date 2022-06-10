@@ -56,7 +56,7 @@
 jQuery(function($) {
     // Asynchronously Load the map API 
     var script = document.createElement('script');
-    script.src = "//maps.googleapis.com/maps/api/js?sensor=false&callback=initialize&key=AIzaSyDOj5QYd5pTb8_Y2Qf-tEXWn78Tvnf_ggE";
+    script.src = "//maps.googleapis.com/maps/api/js?sensor=false&callback=initialize&key=AIzaSyBQ9J6iIfkrIhxltHODZBAyK1Nyir9bS20";
     document.body.appendChild(script);
 });
 let map;
@@ -131,7 +131,7 @@ function initialize() {
 
 <body>
     <div class="wrapper">
-        <div class="sidebar" data-image="../../assets/img/3.png" data-color="green">
+        <div class="sidebar" data-image="../../assets/img/3.png" data-color="darkGreen">
             <div class="sidebar-wrapper">
                 <div class="logo">
                     <a class="simple-text">
