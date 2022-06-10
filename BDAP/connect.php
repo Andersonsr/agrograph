@@ -4,7 +4,7 @@
     use Laudis\Neo4j\ClientBuilder;
     
     $client = ClientBuilder::create()
-        ->withDriver('bolt', 'bolt://neo4j:'.$_SERVER['HTTP_NEO4J_PASS'].'@localhost:7687') 
+        ->withDriver('bolt', 'bolt://neo4j:pwdneo4j@localhost:7687') 
         ->withDefaultDriver('bolt')
         ->build();
     

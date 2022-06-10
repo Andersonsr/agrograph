@@ -41,7 +41,7 @@
 
 <body>
     <div class="wrapper">
-        <div class="sidebar" data-image="../assets/img/3.png" data-color="green">
+        <div class="sidebar" data-image="../assets/img/3.png" data-color='green'>
             <div class="sidebar-wrapper">
                 <div class="logo">
                     <a class="simple-text">
@@ -105,15 +105,30 @@
                                     <h4 class='card-title'>AgroGraph</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p>Plataforma para armazenamento de dados espaço-temporais de Agricultura de Precisão.</p>
-									
-                                </div><div class="card-body">
-                                    <p>Projeto desenvolvido para dissertação de Mestrado do Programa de Pós-Graduação em Computação da Aplicada - Unipampa em parceria com Embrapa Pecuária Sul.</p>
-									<center>
-									<img src='../images/logoemuni.JPG'/>
-									</center>
+                                    <p>Plataforma para armazenamento de dados espaço-temporais de produção vegetal.</p>
 									
                                 </div>
+                                
+                                <div class="card-body">
+                                    <p>Projeto desenvolvido pelo Programa de Pós-Graduação em Computação Aplicada (<a href='https://cursos.unipampa.edu.br/cursos/ppgcap/'>PPGCAP</a>), parceria entre a Universidade Federal do Pampa e a Embrapa Pecuária Sul.</p>
+                                    <fieldset>
+                                    <ul class='nav'>
+                                        <li class='nav-link'>
+                                            <p>Coordenação:<br>Ana Paula Lüdtke Ferreira <br> Naylor Bastiani Perez</p>
+                                        </li>
+                                        <li class='nav-link'>
+                                            <p>Desenvolvedores:<br>Anderson dos Santos da Rosa<br>Rebeca Einhardt Fiss</p>
+                                        </li>
+                                    </ul>
+                                    </fieldset>
+                                </div>
+                                    
+                                <div class='card-body'>
+                                    <center>
+									<img src='../images/logoemuni.JPG'/>
+									</center>
+                                </div>
+                                
                             </div>
                         </div>
                     </div>

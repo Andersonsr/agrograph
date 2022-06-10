@@ -15,6 +15,7 @@
 <?php
     include_once '../sessioncheck.php';
 	include_once '../connect.php';
+    // print_r($_SESSION);
     
 ?>
 <!DOCTYPE html>
@@ -249,7 +250,8 @@ function initialize() {
 												<br />
 												<?php
 												
-												$query = "MATCH (v:Variavel) RETURN DISTINCT v.tipo ORDER BY v.tipo";
+												$query = "MATCH (v:Variavel)<-[o:Oque]-(m:Medicao)-[p:Proprietario]->(u:User) 
+                                                          WHERE id(u)=".$_SESSION['id']." RETURN DISTINCT v.tipo ORDER BY v.tipo";
 												$result = $client->run($query);
 																								
 												foreach($result as $r){
