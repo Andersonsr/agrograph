@@ -51,7 +51,7 @@
                     <img src="../images/unnamed.png">
 
                     <div class="texto">
-                        <p>Este projeto tem como objetivo desenvolver uma plataforma para armazenamento de dados espaço-temporais de Agricultura de Precisão.</p>
+                        <p>Este projeto tem como objetivo desenvolver uma plataforma para armazenamento de dados espaço-temporais de produção vegetal.</p>
                         
                     </div>
                     <div class="text-center p-t-90">
