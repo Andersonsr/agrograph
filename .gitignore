@@ -1,3 +1,4 @@
-composer/vendor/
+composer/vendor/*
 composer/composer.lock
+neo4j/*
 .htaccess

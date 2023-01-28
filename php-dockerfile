@@ -1,0 +1,12 @@
+FROM php:8.2-apache
+
+EXPOSE 80
+VOLUME /var/www/html
+
+RUN apt-get update -y
+RUN apt-get install -y libpng-dev libzip-dev libonig-dev zlib1g-dev
+RUN docker-php-ext-install mbstring
+RUN docker-php-ext-install zip
+RUN docker-php-ext-install gd
+ENTRYPOINT ["sh", "-c", "cd /var/www/html/composer && ./composer.phar update && \ 
+            /usr/sbin/apachectl -D FOREGROUND"] 
