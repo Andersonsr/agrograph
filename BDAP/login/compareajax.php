@@ -1,11 +1,10 @@
 <?php
+    session_start();
     error_reporting(0);
     // ini_set('display_errors', 1);
     // error_reporting(E_ALL);
     if (isset($_POST["email"]) && !empty($_POST["email"]) && isset($_POST["contra"]) && !empty($_POST["contra"])){
         include_once '../connect.php';
-        session_start();
-       
         $email = $_POST["email"];
         $query = "MATCH (user{ email: '" . $email . "' }) RETURN user.email";
         $result = $client->run($query);

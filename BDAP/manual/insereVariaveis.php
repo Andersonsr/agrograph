@@ -1,3 +1,10 @@
+<?php
+    include_once '../sessioncheck.php';
+    // echo "<pre>";
+    // print_r($_POST);
+    // echo "</pre>";
+?>
+
 <!--
 =========================================================
  Light Bootstrap Dashboard - v2.0.1
@@ -12,12 +19,8 @@
 =========================================================
 
  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  -->
-<?php
-    include_once '../sessioncheck.php';
-    // echo "<pre>";
-    // print_r($_POST);
-    // echo "</pre>";
-?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 

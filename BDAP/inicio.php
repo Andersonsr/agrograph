@@ -1,3 +1,9 @@
+<?php
+    include_once 'sessioncheck.php';
+    // print_r($_SESSION);
+    // error_reporting(0);
+    // include_once 'connect.php';
+?>
 <!--
 =========================================================
  Light Bootstrap Dashboard - v2.0.1
@@ -12,11 +18,8 @@
 =========================================================
 
  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  -->
-<?php
-    // error_reporting(0);
-    include_once 'sessioncheck.php';
-    // include_once 'connect.php';
-?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 

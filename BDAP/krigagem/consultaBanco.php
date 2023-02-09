@@ -1,6 +1,6 @@
 <?php
-//echo "<pre>";
-//print_r($_POST);
+    include_once '../sessioncheck.php';
+	include_once '../connect.php';
 ?>
 
 <!--
@@ -17,10 +17,7 @@
 =========================================================
 
  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  -->
-<?php
-    include_once '../sessioncheck.php';
-	include_once '../connect.php';
-?>
+
 <!DOCTYPE html>
 <html lang="en">
 

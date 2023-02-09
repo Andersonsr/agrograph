@@ -1,9 +1,10 @@
 <?php
+include_once '../sessioncheck.php';
 // echo "<pre>";
 // print_r($_POST);
 // echo "</pre>";
 include_once '../connect.php';
-include_once '../sessioncheck.php';
+
 $date = $_POST['data'];
 $indiceTime = $_POST['indiceTime'];
 $indiceData = $_POST['indiceData'];

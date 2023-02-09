@@ -1,3 +1,18 @@
+<?php
+    include_once '../sessioncheck.php';
+    require_once '../../composer/vendor/autoload.php';
+                                            
+    // echo "<pre>";
+    // print_r($_POST);
+    // print_r($_FILES);
+    // print_r($_SESSION);
+    // $hash = password_hash("12345678", PASSWORD_BCRYPT);
+    // if(password_verify("12345678", $hash) ){
+    //     echo "1";
+    // }
+    // echo "</pre>";
+?>
+
 <!--
 =========================================================
  Light Bootstrap Dashboard - v2.0.1
@@ -12,20 +27,8 @@
 =========================================================
 
  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  -->
- <?php
-    include_once '../sessioncheck.php';
-    require_once '../../composer/vendor/autoload.php';
-                                            
-    // echo "<pre>";
-    // print_r($_POST);
-    // print_r($_FILES);
-    // print_r($_SESSION);
-    // $hash = password_hash("12345678", PASSWORD_BCRYPT);
-    // if(password_verify("12345678", $hash) ){
-    //     echo "1";
-    // }
-    // echo "</pre>";
-?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
