@@ -145,18 +145,31 @@ function validateForm() {
                                                     echo "
                                                     <div class='row'>
 
-                                                        <div class='col-md-5 pr-1'>
+                                                        <div class='col-md-3 pr-1'>
                                                             <div class='form-group'>
                                                                 <label>Coluna " . ($c+1) . ":</label> 
                                                                 <input type='text' name='campo$c' class='form-control' required='true' required />
                                                             </div>
                                                         </div>
-                                                        <div class='col-md-5 pr-1'>
+                                                        <div class='col-md-3 pr-1'>
                                                             <div class='form-group'>
                                                                 <label>Unidade de medida:</label>
                                                                 <input type='text' name='medida$c' class='form-control'/>                                                               
                                                             </div>
                                                         </div>
+                                                        <div class='col-md-3 pr-1'>
+                                                        <div class='form-group'>
+                                                            <label>Tipo de dado:</label>
+                                                            <select name='tipo$c' class='form-control'/>
+                                                                <option>solo</option>
+                                                                <option>produção vegetal</option>
+                                                                <option>produção animal</option>
+                                                                <option>meteorologia</option>
+                                                                <option>coordenada</option>
+                                                                <option>outros</option>
+                                                            </select>                                                               
+                                                        </div>
+                                                    </div>
                                                     </div>";
                                                     $c++;
                                                 }        

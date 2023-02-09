@@ -155,7 +155,7 @@ function validateForm() {
                                                 
                                                 foreach($cabecalho as $data) {
                                                     
-                                                    if(preg_match("/data|dia|date|day/i",$data)>0){
+                                                    if(preg_match("/data|dia|date|day|fecha/i",$data)>0){
                                                         $indiceData = $c;
                                                     }
                                                     else if(preg_match("/hora|horario|horário|time/i", $data)>0){
@@ -164,16 +164,29 @@ function validateForm() {
                                                     echo "
                                                     <div class='row'>
 
-                                                    <div class='col-md-5 pr-1'>
+                                                    <div class='col-md-3 pr-1'>
                                                         <div class='form-group'>
                                                             <label>Coluna " . ($c+1) . ":</label> 
                                                             <input type='text' name='campo$c' value='" . $data . "' class='form-control' required='true' required />
                                                         </div>
                                                     </div>
-                                                    <div class='col-md-5 pr-1'>
+                                                    <div class='col-md-3 pr-1'>
                                                         <div class='form-group'>
                                                             <label>Unidade de medida:</label>
                                                             <input type='text' name='medida$c' class='form-control'/>                                                               
+                                                        </div>
+                                                    </div>
+                                                    <div class='col-md-3 pr-1'>
+                                                        <div class='form-group'>
+                                                            <label>Tipo de dado:</label>
+                                                            <select name='tipo$c' class='form-control'/>
+                                                                <option>solo</option>
+                                                                <option>produção vegetal</option>
+                                                                <option>produção animal</option>
+                                                                <option>meteorologia</option>
+                                                                <option>coordenada</option>
+                                                                <option>outros</option>
+                                                            </select>                                                               
                                                         </div>
                                                     </div>
                                                     </div>";

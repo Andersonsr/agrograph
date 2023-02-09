@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   neo4j:
     build: 
@@ -19,3 +20,8 @@ services:
       - "80:80"
     volumes:
       - ".:/var/www/html"   
+
+networks:
+  default:
+    driver: bridge
+    

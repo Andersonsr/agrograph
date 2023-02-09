@@ -32,6 +32,7 @@
     <script>
         $(document).ready(function() {
             $('#formulario').submit(function(event) {
+                event.preventDefault();
                 var datos = $("#formulario").serialize();
                 $.ajax({
                     type: "POST",
@@ -39,23 +40,23 @@
                     data: datos,
                     dataType: "json",
                     encode: true,
-
-                }).done(function (r)){
-                    if (r == 0) {
-                        window.location.href = "login.php";
+                    success: function (r){
+                        if (r == 0) {
+                            window.location.href = "login.php";
+                        }
+                        if (r == 1) {
+                            alert('Este endereço de email já está registrado');
+                        }
+                        if (r == 2) {
+                            alert('As senhas não correspondem');
+                        }
+                        if (r == 3) {
+                            alert('Prencha todos os campos');
+                        }
                     }
-                    if (r == 1) {
-                        alert('Este endereço de email já está registrado');
-                    }
-                    if (r == 2) {
-                        alert('As senhas não correspondem');
-                    }
-                    if (r == 3) {
-                        alert('Prencha todos os campos');
-                    }
-                }
+                })
             });
-            event.preventDefault();
+            
         });
 
     </script>
