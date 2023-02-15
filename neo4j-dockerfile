@@ -14,5 +14,6 @@ ENV NEO4J_server_http_listen__address=:7474
 ENV NEO4J_server_windows__service__name=neo4j
 ENV NEO4J_dbms_security_procedures_unrestricted=spatial.*
 ENV NEO4J_server_databases_writable=true
+NEO4J_AUTH=neo4j/123456
 
 ADD https://github.com/neo4j-contrib/spatial/releases/download/0.28.1-neo4j-4.4.3/neo4j-spatial-0.28.1-neo4j-4.4.3-server-plugin.jar plugins/
