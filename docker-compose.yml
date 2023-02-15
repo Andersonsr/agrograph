@@ -10,9 +10,7 @@ services:
     volumes:
       - "./neo4j/data:/data"
       - "./neo4j/logs:/logs"
-    depends_on:
-      - "php"
-
+    
   php:
     build: 
       dockerfile: php-dockerfile
@@ -20,6 +18,16 @@ services:
       - "80:80"
     volumes:
       - ".:/var/www/html"   
+    depends_on:
+      - "neo4j"
+
+  python:
+    build:
+      dockerfile: python-dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - "neo4j"
 
 networks:
   default:

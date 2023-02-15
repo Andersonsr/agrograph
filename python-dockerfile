@@ -1,0 +1,17 @@
+FROM python:3
+
+EXPOSE 8080
+
+WORKDIR /usr/src/app
+
+RUN apt-get update
+RUN apt-get install git
+RUN pip install --upgrade pip
+RUN apt-get install libgeos-dev -y
+RUN pip install django
+RUN pip install djangorestframework
+RUN pip install neomodel
+RUN pip install django_neomodel
+RUN git clone https://github.com/Andersonsr/agrograph-api.git
+
+ENTRYPOINT python agrograph-api/manage.py runserver 8000

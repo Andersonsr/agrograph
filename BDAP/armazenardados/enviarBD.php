@@ -1,12 +1,10 @@
 <?php
-                                                   
+include_once '../sessioncheck.php';                                                   
 include '../connect.php';
-include_once '../sessioncheck.php';
 require_once '../../composer/vendor/autoload.php';
-
-// print_r($_POST);
-// print_r($_SESSION);
-// echo "oi";
+error_reporting(1);
+print_r($_POST);
+print_r($_SESSION);
 
 $expressaoDataBR = "/(([^0-9][1-9][^0-9])|(0[1-9])|([1-2][0-9])|(3[0-1]))[-\/](([1-9])|(1[0-2]))[-\/](([0-9]{4})|([0-9]{2}))/";
 $expressaoDataUS = "/((0[1-9])|(1[0-2])|^[1-9])[-\/](([^0-9][1-9][^0-9])|(0[1-9])|([1-2][0-9])|(3[0-1]))[-\/](([0-9]{4})|([0-9]{2}))/";
@@ -52,10 +50,10 @@ if (!empty($sheetData)) {
 		if($row == 1){
 			//executa uma vez
 			for ($counter = 0; $counter < $num; $counter++){
-				$campo = "campo" . $counter;
-				$medida = "medida" . $counter;
-				$arraycampo[] = $_POST[$campo];
-				$arraymedida[] = $_POST[$medida];
+				$arraycategoria[] = $_POST["tipo$counter"];
+				$arraycampo[] = $_POST["campo$counter"];
+				$arraymedida[] = $_POST["medida$counter"];
+				
 			
 				if(preg_match("/latitude/i", $_POST[$campo])>0){
 					$latitude = $counter;
@@ -100,7 +98,9 @@ if (!empty($sheetData)) {
 					if($c != $longitude && $c != $latitude && $c != $indiceData && $c != $indiceHora){
 						$tipo= $arraycampo[$c]; 
 						$valor= str_replace(',' , '.' , $data[$c]);
-						$medidabd= $arraymedida[$c];
+						$medida= $arraymedida[$c];
+						$categoria = $arraycategoria[$c];
+						
 					
 						//verifica se ja existe a variavel no banco de dados 
 						$query = "MATCH (v:Variavel) WHERE v.tipo = '$tipo' AND v.valor = $valor "; 
@@ -112,9 +112,9 @@ if (!empty($sheetData)) {
 						
 						//se nao existe insere no db
 						if (!count($result)){
-							$query = "CREATE (v:Variavel {tipo: '$tipo', valor: $valor ";
+							$query = "CREATE (v:Variavel {tipo: '$tipo', valor: $valor, categoria: '$categoria' ";
 							if($arraymedida[$c] != ""){
-								$query .=",unidadeMedida: '$medidabd' "; 
+								$query .=",unidadeMedida: '$medida'"; 
 							}
 							$query .= "})RETURN v";
 							$result = $client->run($query);
@@ -249,9 +249,10 @@ if (!empty($sheetData)) {
 		
 		$row++;
 	}
+	
 	unlink($filename);	
 	if(!$erro){
-		header("location:armazenardados.php?insert");
+	header("location:armazenardados.php?insert");
 	}
 		
 }
