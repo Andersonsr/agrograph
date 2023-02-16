@@ -6,6 +6,8 @@ As funcionalidades bem como o processo de desenvolvimento estão documentados no
 Uma breve apresentação da plataforma 
 https://youtu.be/S6GAsUKy5rM
 
+A API do agrograph ainda está em desevolvimento pode ser encontrada no seguinte link: https://github.com/Andersonsr/agrograph-api 
+
 ## Instalação
 Para rodar a aplicação em sua própira máquina com a finalidade de testar suas funcionalidades, siga os seguintes passos:  
 
