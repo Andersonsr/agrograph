@@ -35,23 +35,35 @@
                 var datos = $("#formulario").serialize();
                 $.ajax({
                     type: "POST",
-                    url: 'compareajax.php',
+                    url: 'http://localhost:8000/v1/login/',
                     data: datos,
+                    dataType: 'json',
                     success: function(r) {
-                        if (r == 0) {
-                            alert('Email incorreto');
-                        }
-                        if (r == 1) {
-                            alert('Senha incorreta');
-                        }
-                        if (r == 2) {
+                        // console.log(1);
+                        $.ajax({
+                        type: "POST",
+                        url: 'initSession.php',
+                        data: datos,
+                        dataType: 'json',
+                        success: function(data) {
                             window.location.href = "../inicio.php";
-                        }
+                        },
+                        error: function(data){
+                           alert(data.responseJSON.message);
+                    }
+                        
+                    });
+                        
+                    },
+                    error: function(data){
+                        alert(data.responseJSON.message);
                     }
                 });
                 return false;
             });
         });
+
+
 
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
@@ -68,7 +80,7 @@
     <div class="limiter">
         <div class="container-login100" style="background-image: url('../../images/3.png');">
             <div class="wrap-login100">
-                <form class="login100-form validate-form" action="compareajax.php" method="post" id="formulario">
+                <form class="login100-form validate-form" action="" method="post" id="formulario">
                     <span class="login100-form-logo">
                         <i class="zmdi zmdi-account"></i>
                     </span>
@@ -83,7 +95,7 @@
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Digite uma senha">
-                        <input class="input100" type="password" name="contra" minlenght="8" maxlength="16" placeholder="Senha">
+                        <input class="input100" type="password" name="password" minlenght="8" maxlength="16" placeholder="Senha">
                         <span class="focus-input100" data-placeholder="&#xf191;"></span>
                     </div>
 

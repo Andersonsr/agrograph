@@ -1,3 +1,10 @@
+<?php
+    include_once '../sessioncheck.php';
+	include_once '../connect.php';
+	
+	$result = $client->run($_SESSION['query']);
+?>
+
 
 <!--
 =========================================================
@@ -13,14 +20,8 @@
 =========================================================
 
  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  -->
-<?php
-    include_once '../sessioncheck.php';
-	include_once '../connect.php';
-	
-	$result = $client->run($_SESSION['query']);
 
-
-?>
+ 
 <!DOCTYPE html>
 <html lang="en">
 

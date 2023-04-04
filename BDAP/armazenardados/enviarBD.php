@@ -82,12 +82,12 @@ if (!empty($sheetData)) {
 			$longitudebd = $data[$longitude];
 			if(is_numeric($longitudebd) && is_numeric($latitudebd)){
 				//verifica se ja existe a localizacao no db
-				$query = "MATCH (l:Localizacao) WHERE l.latitude = $latitudebd AND l.longitude = $longitudebd RETURN l";
+				$query = "MATCH (l:Location) WHERE l.latitude = $latitudebd AND l.longitude = $longitudebd RETURN l";
 				$result = $client->run($query);		
 				
 				//se nao existe insere a localizacao no db
 				if (!count($result)){
-					$query = "CREATE (l:Localizacao {latitude:$latitudebd, longitude:$longitudebd})"
+					$query = "CREATE (l:Location{latitude:$latitudebd, longitude:$longitudebd})"
 							." WITH l CALL spatial.addNode('layer',l) YIELD node RETURN node";
 		
 					$result = $client->run($query);
@@ -103,18 +103,18 @@ if (!empty($sheetData)) {
 						
 					
 						//verifica se ja existe a variavel no banco de dados 
-						$query = "MATCH (v:Variavel) WHERE v.tipo = '$tipo' AND v.valor = $valor "; 
+						$query = "MATCH (v:Variable) WHERE v.name = '$tipo' AND v.value = $valor "; 
 						if($arraymedida[$c] != ""){
-							$query .= "AND v.unidadeMedida = '$medidabd' ";
+							$query .= "AND v.unit = '$medidabd' ";
 						}
 						$query .= "RETURN v";
 						$result = $client->run($query);
 						
 						//se nao existe insere no db
 						if (!count($result)){
-							$query = "CREATE (v:Variavel {tipo: '$tipo', valor: $valor, categoria: '$categoria' ";
+							$query = "CREATE (v:Variable {name: '$tipo', value: $valor, category: '$categoria' ";
 							if($arraymedida[$c] != ""){
-								$query .=",unidadeMedida: '$medida'"; 
+								$query .=",unit: '$medida'"; 
 							}
 							$query .= "})RETURN v";
 							$result = $client->run($query);
@@ -187,38 +187,41 @@ if (!empty($sheetData)) {
 								}
 							}
 															
-							$query = "MATCH (d:Data) WHERE d.data = '$date' RETURN id(d)";
+							$query = "MATCH (d:Date) WHERE d.date = '$date' RETURN id(d)";
 							$result = $client->run($query);			
 							//cria no para a data caso nao exista
 							if (!count($result)){
-								$query="CREATE (d:Data {data: '$date'}) RETURN d";
+								$query="CREATE (d:Date {date: '$date'}) RETURN d";
 								$result = $client->run($query);
 								// echo "criou data";
 							}	
 						}
 
 						//para identificar o hyperedge
-						$medicaoResumo =" $latitudebd$longitudebd$date";
+						$medicaoResumo ="date";
 						if($indiceHora != -1){
 							$medicaoResumo.="$data[$indiceHora]";
 						} 
 						$medicaoResumo .= "$userID";
+						$medicaoResumo .= $latitudebd$longitudebd$
 						$medicaoID = hash("sha256",$medicaoResumo);
 
 						//verifica se ja esxiste o hyperedge para localizacao, data/hora, usuario
-						$query = "MATCH (m:Medicao) WHERE m.resumo='$medicaoID' RETURN m";
+						$query = "MATCH (m:Measurement) WHERE m.hash='$medicaoID' RETURN m";
 						$result = $client->run($query);
 						
 						//cria hyperedge e adiciona a variavel
 						if (!count($result)){
-							$query =  "MATCH (l:Localizacao) WHERE l.latitude = $latitudebd AND l.longitude = $longitudebd"
-							." WITH l MATCH (d:Data) WHERE d.data = '$date' CREATE (l)<-[o:Onde]-(m:Medicao {resumo:'$medicaoID'})-[q:Quando";
-							if($indiceHora != - 1){
-								$query .= "{horario:'$data[$indiceHora]'}";
+							$query =  "MATCH (l:Location) WHERE l.latitude = $latitudebd AND l.longitude = $longitudebd"
+							." WITH l MATCH (d:Date) WHERE d.date = '$date' CREATE (l)<-[o:where]-(m:Measurement {hash:'$medicaoID'";
+							
+								if($indiceHora != - 1){
+								$query .= " time:'$data[$indiceHora]'";
 							}
-							$query .= "]->(d) WITH m MATCH (u:User) WHERE u.email = '$email' CREATE "
-							."(m)-[p:Proprietario]->(u) WITH m MATCH (v:Variavel) WHERE v.tipo = '$tipo' "
-							."AND v.valor = $valor CREATE (m)-[oq:Oque]->(v)";
+						
+							$query .= "})-[q:when]->(d) WITH m MATCH (u:UserProfile) WHERE u.email = '$email' CREATE "
+							."(m)<-[p:measurements]-(u) WITH m MATCH (v:Variable) WHERE v.category = '$tipo' "
+							."AND v.value = $valor CREATE (m)-[oq:what]->(v)";
 							
 							$client->run($query);
 						}

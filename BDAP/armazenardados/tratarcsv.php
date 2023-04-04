@@ -63,6 +63,31 @@ function validateForm() {
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
 	<style>*{font-family: 'Roboto', sans-serif;}</style>
 	
+    <script>
+        $(document).ready(function() {
+            $('#formulario').submit(function(event) {
+                event.preventDefault();
+                var datos = $("#formulario").serialize();
+                $.ajax({
+                    type: "POST",
+                    url: 'http://localhost:8000/v1/insert/',
+                    data: datos,
+                    dataType: "json",
+                    encode: true,
+                    success: function (data){
+                        window.location.href = "armazenardados.php?insert";
+                            
+                    },
+                    error: function(data){
+                        alert(data.responseJSON.message);
+                    }
+                })
+            });
+            
+        });
+
+    </script>
+
 </head>
 <body>
     <div class="wrapper">

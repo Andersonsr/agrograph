@@ -36,23 +36,16 @@
                 var datos = $("#formulario").serialize();
                 $.ajax({
                     type: "POST",
-                    url: 'insertajax.php',
+                    url: 'http://localhost:8000/v1/sing-in/',
                     data: datos,
                     dataType: "json",
                     encode: true,
-                    success: function (r){
-                        if (r == 0) {
-                            window.location.href = "login.php";
-                        }
-                        if (r == 1) {
-                            alert('Este endereço de email já está registrado');
-                        }
-                        if (r == 2) {
-                            alert('As senhas não correspondem');
-                        }
-                        if (r == 3) {
-                            alert('Prencha todos os campos');
-                        }
+                    success: function (data){
+                        window.location.href = "login.php";
+                            
+                    },
+                    error: function(data){
+                        alert(data.responseJSON.message);
                     }
                 })
             });
@@ -67,7 +60,7 @@
     <div class="limiter">
         <div class="container-login100" style="background-image: url('../../images/3.png');">
             <div class="wrap-login100">
-                <form class="login100-form validate-form" method="post" id="formulario" action="insertajax.php">
+                <form class="login100-form validate-form" method="post" id="formulario" action="">
                     <span class="login100-form-logo">
                         <i class="zmdi zmdi-accounts-add"></i>
                     </span>
@@ -77,7 +70,7 @@
                     </span>
 
                     <div class="wrap-input100 validate-input" data-validate="Digite seu nome">
-                        <input class="input100" type="text" name="nombre" maxlenght="128" placeholder="Nome">
+                        <input class="input100" type="text" name="name" maxlenght="128" placeholder="Nome">
                         <span class="focus-input100" data-placeholder="&#xf207;"></span>
                     </div>
 
@@ -87,17 +80,17 @@
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Digite a sua Instituição">
-                        <input class="input100" type="text" name="inst" maxlenght ="128" placeholder="Instituição">
+                        <input class="input100" type="text" name="institution" maxlenght ="128" placeholder="Instituição">
                         <span class="focus-input100" data-placeholder="&#xf128;"></span>
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Digite uma senha">
-                        <input class="input100" type="password" minlength="8" maxlength="16" name="contra1" placeholder="Senha">
+                        <input class="input100" type="password" minlength="8" maxlength="16" name="password" placeholder="Senha">
                         <span class="focus-input100" data-placeholder="&#xf191;"></span>
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Digite uma senha">
-                        <input class="input100" type="password" minlength="8" maxlength="16" name="contra2" placeholder="Confirmar senha">
+                        <input class="input100" type="password" minlength="8" maxlength="16" name="password2" placeholder="Confirmar senha">
                         <span class="focus-input100" data-placeholder="&#xf191;"></span>
                     </div>
 
