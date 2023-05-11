@@ -53,28 +53,13 @@
                     if ($.inArray(get_ext[0].toLowerCase(), exts) > -1) {
 //                        alert('Allowed extension!');
                     } else {
-                        alert('Selecione um arquivo CSV');
+                        alert('Selecione um arquivo valido');
                         event.preventDefault();
                     }
                 }
             });
         });
 
-    </script>
-
-    <script type="text/javascript">
-        function triagem(form)
-        {
-            var1=document.getElementById("cabecalhosim");
-            var2=document.getElementById("cabecalhonao");
-            if(var1.checked==true) {
-                form.action="tratarcsv.php";
-            }
-
-            else {
-                form.action="tratarcsvSemCabecalho.php";
-            }
-        }
     </script>
 	
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
@@ -156,7 +141,7 @@
 
                                 <div class="card-body">
 								
-                                    <form action="tratarcsv.php" method="post" onsubmit="triagem(this);"  id="formulario" enctype="multipart/form-data" >
+                                    <form action="tratarcsv.php" method="post" onsubmit="tratarcsv.php"  id="formulario" enctype="multipart/form-data" >
                                         <div class='form-group'>
                                             <label>Arquivo:</label>
                                             <input type="file"  name="arquivo" accept=".xlsx, .csv, .xls, .ods, .xml"  required />

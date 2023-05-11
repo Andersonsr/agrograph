@@ -3,6 +3,11 @@ FROM php:8.2-apache
 EXPOSE 80
 VOLUME /var/www/html
 
+ENV NEO4J_HOST=localhost
+ENV NEO4J_USER=neo4j
+ENV NEO4J_PASSWORD=123456
+ENV CROSS_SERVER_SECRET=supersecret
+
 RUN apt-get update -y
 RUN apt-get install -y libpng-dev libzip-dev libonig-dev zlib1g-dev
 RUN docker-php-ext-install mbstring

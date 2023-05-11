@@ -54,77 +54,130 @@
 
 	</style>
 	<script>
-jQuery(function($) {
-    // Asynchronously Load the map API 
-    var script = document.createElement('script');
-    script.src = "//maps.googleapis.com/maps/api/js?sensor=false&callback=initialize&key=AIzaSyBQ9J6iIfkrIhxltHODZBAyK1Nyir9bS20";
-    document.body.appendChild(script);
-});
-let map;
-let markers = [];
-let contador=1;
-function initialize() {
-    map;
-    var bounds = new google.maps.LatLngBounds();
-    var mapOptions = {
-        mapTypeId: 'satellite',
-		center:new google.maps.LatLng(-31.32,-53.99),
-		zoom:18, 
-    };
-                    
-    // Display a map on the page
-    map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-    map.setTilt(45);
+        $(document).ready(function() {
+            $('#formulario').submit(function(e) {
+                let datos = $("#formulario").serialize();
+                
+                $.ajax({
+                    type: "POST",
+                    url: 'prepareRequest.php',
+                    data: datos,
+                    dataType: 'json',
+                    success: function(response) {
+                        // console.log(response);
+                        $.ajax({
+                            type: "GET",
+                            url: 'http://localhost:8000/v1/measurements/',
+                            data: response,
+                            dataType: 'json',
+                            success: function(response) {
+                                console.log(response);
+                                $.ajax({
+                                    type: "POST",
+                                    url: 'guardaConsulta.php',
+                                    data: {'data': JSON.stringify(response.data)},
+                                    // dataType: 'json',
+                                    success: function(response) {
+                                        window.location.href = 'apresentaConsulta.php';
+                                    },
+                                    error: function(response){
+                                        console.log('nok');
+                                        console.log(response);
+                                    }
+                                });            
+                            },
+                            
+                            error: function(response){
+                                console.log('erro API');
+                                console.log(response);
+                            }
+                        });
+                    },
+                    error: function(response){
+                        console.log('erro preparacao');
+                        console.log(response);
+                    }
+                });
+                e.preventDefault();
+            });
+        });
         
+        jQuery(function($) {
+            // Asynchronously Load the map API 
+            var script = document.createElement('script');
+            script.src = "//maps.googleapis.com/maps/api/js?sensor=false&callback=initialize&key=AIzaSyBQ9J6iIfkrIhxltHODZBAyK1Nyir9bS20";
+            document.body.appendChild(script);
+        });
 
-	google.maps.event.addListener(map, 'click', function(event) {
-		
-		$("#pontos").append("<div class='form-group' id='ponto"+contador+"'><label>Ponto "+contador+"</label><br /><label>Latitude:&nbsp;</label><input type='text' name='lat"+contador+"' value='"+event.latLng.lat()+
-		"'/><label>&nbsp;&nbsp;Longitude:&nbsp;</label><input type='text'  name='lng"+contador+"' value='"+event.latLng.lng()+"'/></div>");
-		$("#contador").val(contador);
-		if(contador==1)
-			$("#btnRemoverPontos").slideDown();
-		
-		contador++;
-		
-		placeMarker(event.latLng);
+        let map;
+        let markers = [];
+        let contador=1;
+        function initialize() {
+            map;
+            var bounds = new google.maps.LatLngBounds();
+            var mapOptions = {
+                mapTypeId: 'satellite',
+                center:new google.maps.LatLng(-31.32,-53.99),
+                zoom:18, 
+            };
+                            
+            // Display a map on the page
+            map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+            map.setTilt(45);
+                
 
-	});
-}
-	function placeMarker(position) {
-		const marker = new google.maps.Marker({
-		  position: position,
-		  map: map
-		});  
-		markers.push(marker);
-  }
-  // Sets the map on all markers in the array.
-	function setMapOnAll(map) {
-	  for (let i = 0; i < markers.length; i++) {
-		markers[i].setMap(map);
-	  }
-}
-  // Removes the markers from the map, but keeps them in the array.
-	function clearMarkers() {
-	  setMapOnAll(null);
-	}
-	// Deletes all markers in the array by removing references to them.
-	function deleteMarkers() {
-	  clearMarkers();
-	  removePontos();
-	  markers = [];
-	}
-	function removePontos(){
-		var elem, element;
-		for(var i=1; i<contador; i++){
-			elem = "ponto"+i;
-			element = document.getElementById(elem);
-			element.parentNode.removeChild(element);
-		}
-		contador=1;
-		$("#btnRemoverPontos").slideUp();
+            google.maps.event.addListener(map, 'click', function(event) {
+                
+                $("#pontos").append("<div class='form-group' id='ponto"+contador+"'><label>Ponto "+contador+"</label><br /><label>Latitude:&nbsp;</label><input type='text' name='lat"+contador+"' value='"+event.latLng.lat()+
+                "'/><label>&nbsp;&nbsp;Longitude:&nbsp;</label><input type='text'  name='lng"+contador+"' value='"+event.latLng.lng()+"'/></div>");
+                $("#contador").val(contador);
+                if(contador==1)
+                    $("#btnRemoverPontos").slideDown();
+                
+                contador++;
+                
+                placeMarker(event.latLng);
 
-	}
+            });
+        }
+
+        function placeMarker(position) {
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map
+            });  
+            markers.push(marker);
+        }
+
+        // Sets the map on all markers in the array.
+        function setMapOnAll(map) {
+            for (let i = 0; i < markers.length; i++) {
+                markers[i].setMap(map);
+            }
+        }
+
+        // Removes the markers from the map, but keeps them in the array.
+        function clearMarkers() {
+            setMapOnAll(null);
+        }
+
+        // Deletes all markers in the array by removing references to them.
+        function deleteMarkers() {
+            clearMarkers();
+            removePontos();
+            markers = [];
+        }
+
+        function removePontos(){
+            var elem, element;
+            for(var i=1; i<contador; i++){
+                elem = "ponto"+i;
+                element = document.getElementById(elem);
+                element.parentNode.removeChild(element);
+            }
+            contador=1;
+            $("#btnRemoverPontos").slideUp();
+    	}
 
 
 </script>
@@ -215,7 +268,7 @@ function initialize() {
 										
 									</div>
                                     
-									<form action="apresentaConsulta.php" method="post">
+									<form action="" method="post" id='formulario'>
 
 									<div class="row">
 										<div class="col-md-10 pr-1">
@@ -251,15 +304,13 @@ function initialize() {
 												<br />
 												<?php
 												
-												$query = "MATCH (v:Variavel)<-[o:Oque]-(m:Medicao)-[p:Proprietario]->(u:User) 
-                                                          WHERE id(u)=".$_SESSION['id']." RETURN DISTINCT v.tipo ORDER BY v.tipo";
+												$query = "MATCH (v:Variable)<-[o:What]-(m:Measurement)<-[p:Measurements]-(u:UserProfile) 
+                                                          WHERE u.email='".$_SESSION['email']."' RETURN DISTINCT v.name ORDER BY v.name";
 												$result = $client->run($query);
-																								
-												foreach($result as $r){
-													$t = $r->get('v.tipo');
-			            							echo '<input type="checkbox" name="'.$t.'" value="'.$t.'"/> <label>'.$t.'</label> <br />';
+                                                foreach($result as $r){
+													$t = $r->get('v.name');
+			            							echo '<input type="checkbox" name="var[]" value="'.$t.'"/> <label>'.$t.'</label> <br />';
                                                 }
-												
 												?>
 																							
 											</div>

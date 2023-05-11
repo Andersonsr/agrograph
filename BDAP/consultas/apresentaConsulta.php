@@ -1,6 +1,7 @@
 <?php
 include_once '../sessioncheck.php';
-	include_once '../connect.php';
+include_once '../connect.php';
+// print_r($_POST);
 ?>
 
 <!--
@@ -29,99 +30,9 @@ var markers = [];
 
 <?php
 
-// print_r($_POST);
-// print_r($_SESSION);
+print_r($_POST);
+print_r($_SESSION);
 $email = $_SESSION["email"];
-
-if(isset($_GET['filtros'])){
-	$queryOriginal = $_SESSION['queryOriginal'];
-	$partes=explode('WHERE', $queryOriginal);
-	
-	$where = "WHERE v.tipo='". $_POST['variaveis']."' AND v.valor".$_POST['operadores'].$_POST['valor']; 
-		//echo $where."<br>";
-	
-	//aqui faz o for.. a cada filtro tem que concatenar a string
-	for($i=1; $i<=$_POST['inputContadorFiltros']; $i++)
-		$where.=" ".$_POST['concatenador'.$i]." v.tipo='".$_POST['variaveis'.$i]."'".
-		" AND v.valor".$_POST["operadores$i"].$_POST["valor$i"];
-	
-	$query = $partes[0]. $where . ' WITH m,v,d,q MATCH (u)<-[proprietario]-(m:Medicao)-[o:Onde]->(node';
-	if(!str_contains($partes[0], 'CALL')){
-		$query .= ":Localizacao";
-	}	
-	$query .= ") WHERE ".$partes[2];
-	
-}
-else{
-	// echo"<p>nao tem filtros</p>";
-	$poli = '';
-	if(isset($_POST['lat1'])){
-		$poli = "'POLYGON ((";
-		for($i=1; $i<=$_POST['contador'];$i++){
-			$la = "lat".$i;
-			$lo = "lng".$i;
-			$poli .= $_POST[$lo] .' '. $_POST[$la] .', ';
-		}
-		$poli .= $_POST['lng1'] .' '. $_POST['lat1'] . "))'";
-	}
-
-	$query = "MATCH (v:Variavel) RETURN DISTINCT v.tipo";
-	$result = $client->run($query);
-
-	$where = 'WHERE (';																								
-	foreach($result as $r){
-		$t = $r->get('v.tipo');
-		$a = array(" ", ".");
-		$t = str_replace($a,'_',$t);
-		
-		if(isset($_POST[$t])){
-			$where .= "v.tipo = '".$r->get('v.tipo')."' OR ";
-		}
-	}
-
-
-	$where = substr($where, 0, -4);
-
-
-	if($where == 'WHE')
-		$where = ' WHERE ';
-	else
-		$where .= ') AND ';
-
-	if($_POST['inicio'] != '')
-		$where .= 'd.data >= "'. $_POST['inicio'].'"  AND ';
-
-	if($_POST['fim'] != '')
-		$where .= 'd.data <= "'. $_POST['fim'].'"';
-	else $where = substr($where, 0, -5);
-
-	if ($where == ' W')
-		$where = '';
-
-
-	if($poli == '')
-		$query = "MATCH (v:Variavel)<-[oq:Oque]-(m:Medicao)-[q:Quando]->(d:Data) "
-				. $where. " WITH m, v, q, d MATCH (u:User)<-[p:Proprietario]-(m)-[o:Onde]->(node:Localizacao)".
-				"WHERE u.email= '$email'".
-				" RETURN node.latitude, node.longitude, v.tipo, v.valor, d.data, q.horario ORDER BY node.latitude, node.longitude, v.tipo, d.data;";
-	else
-		$query = "CALL spatial.intersects('layer', ".$poli." ) YIELD node 
-				 OPTIONAL MATCH (v:Variavel)<-[oq:Oque]-(m:Medicao)-[q:Quando]->(d:Data) "
-				 . $where. "WITH m, v, d, q MATCH (u:User)<-[p:Proprietario]-(m)-[o:Onde]->(node) ".
-				 "WHERE u.email='$email' ".
-				 "RETURN node.latitude, node.longitude, v.tipo, v.valor, d.data, q.horario ORDER BY node.latitude, node.longitude, v.tipo, d.data;";
-}
-
-// echo"<p>$query</p>";
-
-$result = $client->run($query);
-
-$_SESSION['queryComFiltros']= $query;
-
-if(!isset($_GET['filtros']))
-	$_SESSION['queryOriginal'] = $query;
-
-$_SESSION['query'] = $query;
 $lat = array();
 $lot = array();
 $title = array();
@@ -130,45 +41,14 @@ $cont = array();
 $i=1;
 $conteudo = '';
 
-foreach($result as $r){
-	$latbd = $r->get('node.latitude');
-	$longbd = $r->get('node.longitude');
-
-	if ($latbd != end($lat) AND $longbd != end($lot)){
-		array_push($lat, $latbd);
-		array_push($lot, $longbd);
-				
-		array_push($title, 'Ponto '.$i);
-		$i++;
-		
-		$data = explode("-", $r->get('d.data'));
-		
-		$label = $r->get('v.tipo') . ': '. $r->get('v.valor').' ('. $data[2].'/'.$data[1].'/'.$data[0];
-		if(!empty($r->get('q.horario'))){
-			$label .= ' '.$r->get('q.horario');
-		}
-		$label.= ') </br>';
-		array_push($cont, $label);
-	}
-	else{
-		$data = explode("-", $r->get('d.data'));
-		$conteudo = array_pop($cont) . $r->get('v.tipo') . ': '. $r->get('v.valor').' ('. $data[2].'/'.$data[1].'/'.$data[0];
-		if(!empty($r->get('q.horario'))){
-			$conteudo .= ' '.$r->get('q.horario');
-		}
-		$conteudo.= ') </br>';
-		array_push($cont, $conteudo);
-	}
-
-}
-for($i = 0; $i < count($lat); $i++){
-    echo "
-	<script>
-	// Multiple Markers
-    markers.push([
-        '$title[$i]', ".floatval($lat[$i]).", ".floatval($lot[$i]).", '$cont[$i]'
-    ]);</script>";
-}
+// for($i = 0; $i < count($lat); $i++){
+//     echo "
+// 	<script>
+// 	// Multiple Markers
+//     markers.push([
+//         '$title[$i]', ".floatval($lat[$i]).", ".floatval($lot[$i]).", '$cont[$i]'
+//     ]);</script>";
+// }
 
 ?>
 
@@ -350,12 +230,8 @@ $(document).ready(function(){
                                     
 								<div id="filtros" class="collapse">
 	
-										<form action="apresentaConsulta.php?filtros" method="post">
+									<form action="apresentaConsulta.php?filtros" method="post">
 
-											
-											
-							
-								
 									<div class="row">
 											<div class='form-group mb-6' style="margin-left:8px">
 												<label>Filtros:</label>
@@ -364,10 +240,6 @@ $(document).ready(function(){
 												<select name='variaveis' class="custom-select">
 													<option value='' selected>Variáveis</option>
 													<?php
-												
-												$queryvar = "MATCH (v:Variavel) RETURN DISTINCT v.tipo ORDER BY v.tipo";
-												$resultvar = $client->run($queryvar);
-
 																								
 												foreach($resultvar as $rvar){
 													$t = $rvar->get('v.tipo');
@@ -418,7 +290,7 @@ $(document).ready(function(){
 
 													foreach($resultvar as $rvar){
 													
-													$t = $rvar->get('v.tipo');
+													$t = $rvar->get('v.name');
 													
 													echo '<option value="'.$t.'"/>'.$t.'</option>';
 												

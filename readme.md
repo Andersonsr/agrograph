@@ -12,11 +12,10 @@ A API do agrograph ainda está em desevolvimento pode ser encontrada no seguinte
 Para rodar a aplicação em sua própira máquina com a finalidade de testar suas funcionalidades, siga os seguintes passos:  
 
 1. Executar o comando `docker compose up` dentro  diretório agrograph.
-2. Executar a query `CALL spatial.addPointLayer('layer');` no cliente Neo4j disponível em http://localhost:7474, o usuário é iniciado como `neo4j` e a senha `123456`.  
+
+2. O compose up pode receber alguma variaveis de ambiente. Para usar o container do neo4j como banco de dados mude o NEO4J_HOST para o nome do container, o nome default é `agrograph-neo4j-1`.  
+    ```
+    NEO4J_HOST=agrograph-neo4j-1 NEO4J_USER=neo4j NEO4J_PASSWORD=123456 SECRET=supersecret docker compose up
+    ```
 3. Pronto, é só isso mesmo a maior parte do trabalho quem faz é o querido docker. 
 
-### Troca de Senha
-Caso troque a senha do banco de dados, dois arquivos devem ser modificados para que a aplicação continue funcionando. 
-
-1. O arquivo `BDAP/connect.php ` linha 11.
-2. O arquivo `agrograph-api/agrograph/settings.py` linha 77 contido no container agrograph-python.

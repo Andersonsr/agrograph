@@ -137,11 +137,11 @@
                                                     echo "<td>".$latbd."</td>";
                                                     echo "<td>".$longbd."</td>";
 
-                                                        $data = explode("-", $r->get('d.data'));
+                                                        $data = explode("-", $r->get('d.date'));
                                                         echo "<td>".$data[2].'/'.$data[1].'/'.$data[0]."</td>";
-                                                        echo '<td>'.$r->get('q.horario').'</td>';
-                                                        echo "<td>".$r->get('v.tipo')."</td>";
-                                                        echo "<td>".$r->get('v.valor')."</td></tr>";
+                                                        echo '<td>'.$r->get('m.time').'</td>';
+                                                        echo "<td>".$r->get('v.name')."</td>";
+                                                        echo "<td>".$r->get('v.value')."</td></tr>";
                                                         $i++;
 
                                                     }		

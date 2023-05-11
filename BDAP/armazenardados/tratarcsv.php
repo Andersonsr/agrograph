@@ -50,44 +50,62 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <!--===============================================================================================-->
     <script>
+        
+        $(document).ready(function() {
+            $('#formulario').submit(function(e) {
+                var datos = $("#formulario").serialize();
+                $('#submit').hide();
+                $('#loading').show();
+                $.ajax({
+                        type: "POST",
+                        url: './enviarBD.php',
+                        data: datos,
+                        success: function(response) {  
+                            jsonResponse = JSON.parse(response);
+                            console.log(jsonResponse);
+                            data = jsonResponse.data;
+                            authToken = jsonResponse.authToken;
+                            secret = jsonResponse.cross_secret;
 
+                            $.ajax({
+                                type: "POST",
+                                url: 'http://localhost:8000/v1/insert/',
+                                data: {
+                                    'data': JSON.stringify(data), 
+                                    'authToken': authToken, 
+                                    'cross_secret': secret
+                                },
+                                dataType: 'json',
 
-function validateForm() {
-	$('#submit').hide();
-    $('#loading').show();
-    return true;
-  }
-
+                                success: function(response) {
+                                    window.location.href = "../inicio.php";
+                                    alert(response.message);
+                                },
+                                
+                                error: function(response){
+                                    $('#loading').hide();
+                                    $('#submit').show();
+                                    alert(response.message);
+                                }
+                            });
+                        },
+                        error: function(response){
+                            $('#loading').hide();
+                            $('#submit').show();
+                            alert('erro');
+                        }
+                });
+                return false;
+            });
+        });
     </script>
-	
+    
+    
+
+
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
 	<style>*{font-family: 'Roboto', sans-serif;}</style>
 	
-    <script>
-        $(document).ready(function() {
-            $('#formulario').submit(function(event) {
-                event.preventDefault();
-                var datos = $("#formulario").serialize();
-                $.ajax({
-                    type: "POST",
-                    url: 'http://localhost:8000/v1/insert/',
-                    data: datos,
-                    dataType: "json",
-                    encode: true,
-                    success: function (data){
-                        window.location.href = "armazenardados.php?insert";
-                            
-                    },
-                    error: function(data){
-                        alert(data.responseJSON.message);
-                    }
-                })
-            });
-            
-        });
-
-    </script>
-
 </head>
 <body>
     <div class="wrapper">
@@ -157,9 +175,14 @@ function validateForm() {
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-12 pr-1">
-                                            <form action="enviarBD.php" onsubmit="return validateForm()" method="post" id="formulario" enctype="multipart/form-data">
+                                            <form action="" onsubmit="" method="" id="formulario" enctype="multipart/form-data">
                                                 <?php
                                             // use PhpOffice\PhpSpreadsheet\IOFactory;
+                                            $cabeca = false;
+                                            if($_POST['cabecalho'] == 'sim'){
+                                                $cabeca = true;
+                                            }
+                                            
                                             $parts = explode('.', $_FILES['arquivo']['name']);
                                             $fileName = hash('sha256', $_FILES['arquivo']['name']).'.'.$parts[1];
                                             $fileType = ucfirst($parts[1]);
@@ -178,46 +201,46 @@ function validateForm() {
                                                 $cabecalho = $sheetData[1];
                                                 $indiceData = -1;
                                                 $indiceHora = -1;
+                                                $indiceLatitude = -1;
+                                                $indiceLongitude = -1;
                                                 $c = 0;
                                                 echo "<p class='card-title'>Por favor, confirme os tipos de dados das colunas:</p>";
                                                 
                                                 foreach($cabecalho as $data) {
-                                                    
-                                                    if(preg_match("/data|dia|date|day|fecha/i",$data)>0){
-                                                        $indiceData = $c;
-                                                    }
-                                                    else if(preg_match("/hora|horario|horário|time/i", $data)>0){
-                                                        $indiceHora = $c;
-                                                    }
                                                     echo "
                                                     <div class='row'>
 
-                                                    <div class='col-md-3 pr-1'>
-                                                        <div class='form-group'>
-                                                            <label>Coluna " . ($c+1) . ":</label> 
-                                                            <input type='text' name='campo$c' value='" . $data . "' class='form-control' required='true' required />
+                                                        <div class='col-md-3 pr-1'>
+                                                            <div class='form-group'>
+                                                                <label>Coluna " . ($c+1) . ":</label> 
+                                                                <input type='text' name='campo$c' value='"; 
+                                                                if($cabeca){
+                                                                    echo($data);
+                                                                }  
+                                                                echo("' class='form-control' required='true' required />
+                                                            </div>
+                                                        </div>");
+                                                        
+                                                    echo(
+                                                        "
+                                                        <div class='col-md-3 pr-1'>
+                                                            <div class='form-group'>
+                                                                <label>Unidade de medida:</label>
+                                                                <input type='text' name='medida$c' class='form-control'/>                                                               
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class='col-md-3 pr-1'>
-                                                        <div class='form-group'>
-                                                            <label>Unidade de medida:</label>
-                                                            <input type='text' name='medida$c' class='form-control'/>                                                               
+                                                        <div class='col-md-3 pr-1'>
+                                                            <div class='form-group'>
+                                                                <label>Tipo de dado:</label>
+                                                                <select name='tipo$c' class='form-control'/>
+                                                                    <option>solo</option>
+                                                                    <option>produção vegetal</option>
+                                                                    <option>produção animal</option>
+                                                                    <option>meteorologia</option>
+                                                                </select>                                                               
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class='col-md-3 pr-1'>
-                                                        <div class='form-group'>
-                                                            <label>Tipo de dado:</label>
-                                                            <select name='tipo$c' class='form-control'/>
-                                                                <option>solo</option>
-                                                                <option>produção vegetal</option>
-                                                                <option>produção animal</option>
-                                                                <option>meteorologia</option>
-                                                                <option>coordenada</option>
-                                                                <option>outros</option>
-                                                            </select>                                                               
-                                                        </div>
-                                                    </div>
-                                                    </div>";
+                                                    </div>");
                                                     $c ++;
                                                 }                                                    
 
@@ -251,8 +274,6 @@ function validateForm() {
                                                 <img src='../../assets/img/loading.gif' width='80px;' id='loading' style='display:none;'>
 
                                                 ";
-                                                
-                                                    
                                             }
                                             ?>
                                             </form>
@@ -295,3 +316,4 @@ function validateForm() {
 <script src="../../assets/js/demo.js"></script>
 
 </html>
+

@@ -1,6 +1,6 @@
 <?php
     session_start();
     if (empty($_SESSION["email"])){
-        header('Location:../login/login.php');
+        header('Location:login.php');
     }
 ?>

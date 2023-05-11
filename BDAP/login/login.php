@@ -38,34 +38,36 @@
                     url: 'http://localhost:8000/v1/login/',
                     data: datos,
                     dataType: 'json',
-                    success: function(r) {
-                        // console.log(1);
+                    success: function(response) {
+                        sessionData = {
+                            'token' : response.token, 
+                            'email' : response.email
+                        };
                         $.ajax({
-                        type: "POST",
-                        url: 'initSession.php',
-                        data: datos,
-                        dataType: 'json',
-                        success: function(data) {
-                            window.location.href = "../inicio.php";
-                        },
-                        error: function(data){
-                           alert(data.responseJSON.message);
-                    }
-                        
-                    });
-                        
+                                type: "POST",
+                                url: 'initSession.php',
+                                data: sessionData,
+                                dataType: 'json',
+                                success: function(data) {
+                                    // alert('ok!');
+                                    // console.log(data);
+                                    window.location.href = "../inicio.php";
+                                },
+                                error: function(data){
+                                    alert('erro!');
+                                }
+                        });
                     },
-                    error: function(data){
-                        alert(data.responseJSON.message);
+                    error: function(response){
+                        // console.log(response);
+                        alert(response.responseJSON.message);
                     }
                 });
                 return false;
             });
         });
-
-
-
     </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
     <style>
         * {

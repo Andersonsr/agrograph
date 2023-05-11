@@ -2,16 +2,11 @@
 include_once '../sessioncheck.php';                                                   
 include '../connect.php';
 require_once '../../composer/vendor/autoload.php';
-error_reporting(1);
-print_r($_POST);
-print_r($_SESSION);
+// error_reporting(1);
+// print_r($_POST);
+// print_r($_SESSION);
 
-$expressaoDataBR = "/(([^0-9][1-9][^0-9])|(0[1-9])|([1-2][0-9])|(3[0-1]))[-\/](([1-9])|(1[0-2]))[-\/](([0-9]{4})|([0-9]{2}))/";
-$expressaoDataUS = "/((0[1-9])|(1[0-2])|^[1-9])[-\/](([^0-9][1-9][^0-9])|(0[1-9])|([1-2][0-9])|(3[0-1]))[-\/](([0-9]{4})|([0-9]{2}))/";
-$expressaoAnoAntes = "/((19[7-9][0-9])|(20[0-6][0-9])[-\/](([1-9][^0-9])|(1[0-2]))[-\/](([1-9]$)|([1-2][0-9])|(3[0-1])|(0[1-9])))/";
 $filename = $_POST['nomeArquivo'];
-$date = $_POST['data'];
-$userID = $_SESSION['id'];
 $cabecalho = $_POST['cabecalho'];
 $email = $_SESSION['email'];
 $indiceData = -1;
@@ -26,238 +21,71 @@ $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($fileType);
 
 $spreadsheet = $reader->load($filename);
 $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, false);
-                  
+
 if (!empty($sheetData)) {
-	
-	if(!empty($date)){
-		//data fixa para todo o arquivo executa uma vez
-		//verifica se ja existe no para a data atual
-		$query = "MATCH (d:Data) WHERE d.data = '$date' RETURN d";
-		$result = $client->run($query);		
-		
-		if (!count($result)){
-			// echo "criou data";
-			$query="CREATE (d:Data {data: '$date'}) RETURN d";
-			$result = $client->run($query);
+	$row = 0;
+	$payload = [];	
+	foreach($sheetData as $data){
+		for ($counter = 0; $counter < count($sheetData[0]); $counter++){
+			$arraycategoria[] = $_POST["tipo$counter"];
+			$arraycampo[] = $_POST["campo$counter"];
+			$arraymedida[] = $_POST["medida$counter"];
 			
-		}	
-				
-	}
-	
-	$row = 1;
-	foreach ($sheetData as $data) { //percorre arquivo csv linha a linha
-		$num = count($data);
-		if($row == 1){
-			//executa uma vez
-			for ($counter = 0; $counter < $num; $counter++){
-				$arraycategoria[] = $_POST["tipo$counter"];
-				$arraycampo[] = $_POST["campo$counter"];
-				$arraymedida[] = $_POST["medida$counter"];
-				
-			
-				if(preg_match("/latitude/i", $_POST[$campo])>0){
-					$latitude = $counter;
-				}
-				else if(preg_match("/longitude/i", $_POST[$campo])>0){
-					$longitude = $counter;
-				}
-				else if(preg_match("/data|date|dia|day/i", $_POST[$campo])>0){
-					$indiceData = $counter;
-				}
-				else if(preg_match("/hora|horario|horário|time/i", $_POST[$campo])>0){
-					$indiceHora = $counter;
-				}
-				
+			if(preg_match("/latitude/i", $_POST["campo$counter"])>0){
+				$latitude = $counter;
 			}
-			if($indiceData==-1 && empty($_POST['data'])){
-				fclose($handle);
-				$erro = true;
-				header("location:armazenardados.php?faltaData");
+			else if(preg_match("/longitude/i", $_POST["campo$counter"])>0){
+				$longitude = $counter;
 			}
+			else if(preg_match("/data|date|dia|day|fecha/i", $_POST["campo$counter"])>0){
+				$indiceData = $counter;
+			}
+			else if(preg_match("/hora|horario|horário|time/i", $_POST["campo$counter"])>0){
+				$indiceHora = $counter;
+			}	
 		}
-		
-		if(!($cabecalho == "sim" and $row == 1)){
-			// executa n vezes;
-			$latitudebd = $data[$latitude];
-			$longitudebd = $data[$longitude];
-			if(is_numeric($longitudebd) && is_numeric($latitudebd)){
-				//verifica se ja existe a localizacao no db
-				$query = "MATCH (l:Location) WHERE l.latitude = $latitudebd AND l.longitude = $longitudebd RETURN l";
-				$result = $client->run($query);		
-				
-				//se nao existe insere a localizacao no db
-				if (!count($result)){
-					$query = "CREATE (l:Location{latitude:$latitudebd, longitude:$longitudebd})"
-							." WITH l CALL spatial.addNode('layer',l) YIELD node RETURN node";
-		
-					$result = $client->run($query);
+	
+		if($indiceData==-1 && empty($_POST['data'])){
+			fclose($handle);
+			$erro = true;
+			header("location:armazenardados.php?faltaData");
+		}
+		 
+		if (!($row == 0 && $cabecalho == 'sim')){
+			$dont = array($indiceData, $indiceHora, $latitude, $longitude);						
+			for ($i = 0; $i < count($data); $i ++){
+				if (!in_array($i, $dont)){
+					$measurement = array(
+						'longitude' => $data[$longitude],
+						'latitude' => $data[$latitude]
+					  );
+  					if ($indiceHora != -1) $measurement += ['time' => $data[$indiceHora]];
 					
-				}
-				
-				for ($c=0; $c < $num; $c++) { 
-					if($c != $longitude && $c != $latitude && $c != $indiceData && $c != $indiceHora){
-						$tipo= $arraycampo[$c]; 
-						$valor= str_replace(',' , '.' , $data[$c]);
-						$medida= $arraymedida[$c];
-						$categoria = $arraycategoria[$c];
-						
-					
-						//verifica se ja existe a variavel no banco de dados 
-						$query = "MATCH (v:Variable) WHERE v.name = '$tipo' AND v.value = $valor "; 
-						if($arraymedida[$c] != ""){
-							$query .= "AND v.unit = '$medidabd' ";
-						}
-						$query .= "RETURN v";
-						$result = $client->run($query);
-						
-						//se nao existe insere no db
-						if (!count($result)){
-							$query = "CREATE (v:Variable {name: '$tipo', value: $valor, category: '$categoria' ";
-							if($arraymedida[$c] != ""){
-								$query .=",unit: '$medida'"; 
-							}
-							$query .= "})RETURN v";
-							$result = $client->run($query);
-							
-						}
-							
-						if($indiceData != -1){
-							//data variavel 
-							$year;
-							$date = $data[$indiceData];
-							$date = str_replace("/","-",$date);
-							$parts = explode('-', $date);
-							
-							if($formato == "dd-mm-yyyy"){
-								if(preg_match($expressaoDataBR, $date)>0){
-									if($parts[2]<100){
-										if($parts[2] > 70){
-											$year = "19".$parts[2];
-										}
-										else{
-											$year = "20".$parts[2];
-										}
-									}
-									$date ="$year-$parts[1]-$parts[0]";
-								}
-								else{//nao esta no formato indicado
-									fclose($handle); 
-									$erro = true;
-									header("location:armazenardados.php?formatoErro");
-									break;
-								}
-								
-							}
-							else if($formato == "mm-dd-yyyy"){
-								if(preg_match($expressaoDataUS, $date)>0){
-									if($parts[2]<100){
-										if($parts[2] > 70){
-											$year = "19".$parts[2];
-										}
-										else{
-											$year = "20".$parts[2];
-										}
-									}
-									$date = "$year-$parts[0]-$parts[1]";
-								}
-								else{//nao esta no formato indicado
-									fclose($handle);
-									$erro = true; 
-									header("location:armazenardados.php?formatoErro");
-									break;
-								}
-							}
-							else if($formato == "yyyy-mm-dd"){
-								if(preg_match($expressaoAnoAntes, $date)>0){
-									if($parts[0]<100){
-										if($parts[0] > 70){
-											$year = "19".$parts[0];
-										}
-										else{
-											$year = "20".$parts[0];
-										}
-									}
-									$date = "$year-$parts[1]-$parts[2]";
-								}
-								else{//nao esta no formato indicado
-									fclose($handle); 
-									$erro = true;
-									header("location:armazenardados.php?formatoErro");
-									break;
-								}
-							}
-															
-							$query = "MATCH (d:Date) WHERE d.date = '$date' RETURN id(d)";
-							$result = $client->run($query);			
-							//cria no para a data caso nao exista
-							if (!count($result)){
-								$query="CREATE (d:Date {date: '$date'}) RETURN d";
-								$result = $client->run($query);
-								// echo "criou data";
-							}	
-						}
-
-						//para identificar o hyperedge
-						$medicaoResumo ="date";
-						if($indiceHora != -1){
-							$medicaoResumo.="$data[$indiceHora]";
-						} 
-						$medicaoResumo .= "$userID";
-						$medicaoResumo .= $latitudebd$longitudebd$
-						$medicaoID = hash("sha256",$medicaoResumo);
-
-						//verifica se ja esxiste o hyperedge para localizacao, data/hora, usuario
-						$query = "MATCH (m:Measurement) WHERE m.hash='$medicaoID' RETURN m";
-						$result = $client->run($query);
-						
-						//cria hyperedge e adiciona a variavel
-						if (!count($result)){
-							$query =  "MATCH (l:Location) WHERE l.latitude = $latitudebd AND l.longitude = $longitudebd"
-							." WITH l MATCH (d:Date) WHERE d.date = '$date' CREATE (l)<-[o:where]-(m:Measurement {hash:'$medicaoID'";
-							
-								if($indiceHora != - 1){
-								$query .= " time:'$data[$indiceHora]'";
-							}
-						
-							$query .= "})-[q:when]->(d) WITH m MATCH (u:UserProfile) WHERE u.email = '$email' CREATE "
-							."(m)<-[p:measurements]-(u) WITH m MATCH (v:Variable) WHERE v.category = '$tipo' "
-							."AND v.value = $valor CREATE (m)-[oq:what]->(v)";
-							
-							$client->run($query);
-						}
-						else{//adiciona variavel a hyperedge existente
-							//verifica se ja existe a conexao entre medicao e a variavel
-							//evitando duplicatas
-							$query = "MATCH (m:Medicao)-[oq:Oque]->(v:Variavel) WHERE m.resumo='$medicaoID'".
-							" AND v.tipo='$tipo' AND v.valor=$valor RETURN m";
-							$result= $client->run($query);
-							
-							if(!count($result)){
-								$query = "MATCH (m) WHERE m.resumo='$medicaoID'"
-								." WITH m MATCH (v:Variavel) WHERE v.tipo = '$tipo' AND v.valor = $valor";
-								if($medidabd!=""){
-									$query.=" AND v.unidadeMedida='$medidabd'";
-								}
-								$query.=" CREATE (m)-[oq:Oque]->(v)";	
-								$client->run($query);
-							}
-							
-						}
+					if( $indiceData != -1){
+						$measurement += ['date' => $data[$indiceData]];	
 					}
+					else {
+						$measurement += ['date' => $_POST['data']];
+					}
+					$measurement += ['variable' => $arraycampo[$i]];
+					$measurement += ['unit' => $arraymedida[$i]];
+					$measurement += ['category' => $arraycategoria[$i]];
+					$measurement += ['value' => $data[$i]];
+					$payload[] = $measurement;
+					
 				}
-		
 			}
-			
 		}
-		
-		$row++;
+		$row ++;
 	}
-	
+
 	unlink($filename);	
-	if(!$erro){
-	header("location:armazenardados.php?insert");
-	}
-		
+	echo json_encode([
+		'data' => $payload, 
+		'authToken' => $_SESSION['token'], 
+		'cross_secret' => $_ENV['CROSS_SERVER_SECRET']
+	]);
+	
 }
 ?>
 
