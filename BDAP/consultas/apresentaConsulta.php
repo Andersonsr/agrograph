@@ -1,7 +1,7 @@
 <?php
 include_once '../sessioncheck.php';
 include_once '../connect.php';
-// print_r($_POST);
+print_r($_POST);
 ?>
 
 <!--
@@ -30,25 +30,26 @@ var markers = [];
 
 <?php
 
-print_r($_POST);
-print_r($_SESSION);
+// print_r($_POST);
+// print_r($_SESSION);
 $email = $_SESSION["email"];
-$lat = array();
-$lot = array();
-$title = array();
-$cont = array();
+$data = $_SESSION['data'];
+$variables = [];
 
-$i=1;
-$conteudo = '';
+for($i = 0; $i < count($data); $i++){
+	if(!in_array($data[$i]->variable, $variables)){
+		array_push($variables, $data[$i]->variable);
+	}
 
-// for($i = 0; $i < count($lat); $i++){
-//     echo "
-// 	<script>
-// 	// Multiple Markers
-//     markers.push([
-//         '$title[$i]', ".floatval($lat[$i]).", ".floatval($lot[$i]).", '$cont[$i]'
-//     ]);</script>";
-// }
+    $conteudo = $data[$i]->variable . ': '. $data[$i]->value .' ('. $data[$i]->date . ') </br>';
+	echo "
+	<script>
+	// Multiple Markers
+    markers.push([
+        'Ponto$i', ".$data[$i]->latitude.", ".$data[$i]->longitude.", '$conteudo'
+    ]);</script>";
+}
+
 
 ?>
 
@@ -140,13 +141,46 @@ function initialize() {
 }
 
 $(document).ready(function(){
-	var contadorFiltros=1;
 	$("#maisFiltros").click(function(){
-		$("#areaMaisFiltros"+contadorFiltros).slideDown();
-		$("#inputContadorFiltros").val(contadorFiltros);
-		contadorFiltros++;
+		let div = document.createElement('div');
+		div.innerHTML = 
+		`<div class="row">
+			<div class='form-group mb-6' style="margin-left:8px">
+				<label>+ Filtros:</label>
+				<br />
+				<select name='concatenadores[]' class="custom-select">
+					<option value='' selected>Operação</option>
+					<option value='AND'>E</option>
+					<option value='OR'>OU</option>
+				</select>
+				<select name='variaveis[]' class="custom-select">
+					<option value='' selected>Variáveis</option>
+				<?php
+
+					foreach($variables as $t){
+						echo '<option value="'.$t.'"/>'.$t.'</option>';
+					
+					}
+				?>
+				</select>
+				<select name='operadores[]' class="custom-select">
+					<option value='' selected>Operadores</option>
+					<option value='>'>Maior</option>
+					<option value='>='>Maior ou igual</option>
+					<option value='<'>Menor</option>
+					<option value='<='>Menor ou igual</option>
+					<option value='='>Igual</option>
+				</select>
+			</div>
+			<div class='form-group mb-3' style='padding-top:27px; margin-left:4px'>											
+				<input type="text" class="form-control" name="valores[]" placeholder="Valor" aria-label="Valor"/>
+			</div>
+												
+			<div class="clearfix"></div>
+		</div>`;
+		// console.log('oi');
+		document.getElementById('extraOptions').appendChild(div);
 	});
-	
 
 });
 </script>
@@ -227,111 +261,48 @@ $(document).ready(function(){
 									</div>
                                 </div>
                                 <div class="card-body">
-                                    
-								<div id="filtros" class="collapse">
-	
-									<form action="apresentaConsulta.php?filtros" method="post">
-
-									<div class="row">
-											<div class='form-group mb-6' style="margin-left:8px">
-												<label>Filtros:</label>
-												<br />
-												<!--- Listar todas as variaveis -->
-												<select name='variaveis' class="custom-select">
-													<option value='' selected>Variáveis</option>
-													<?php
-																								
-												foreach($resultvar as $rvar){
-													$t = $rvar->get('v.tipo');
-													
-													echo '<option value="'.$t.'"/>'.$t.'</option>';
-												
-												}
-												
-												?>
-													
-												
-												</select>
-												<select name='operadores' class="custom-select">
-													<option value='' selected>Operadores</option>
-													<option value='>'>Maior</option>
-													<option value='>='>Maior ou igual</option>
-													<option value='<'>Menor</option>
-													<option value='<='>Menor ou igual</option>
-													<option value='='>Igual</option>
-												</select>
+                                    <div id="filtros" class="collapse">
+										<form action="apresentaConsulta.php?filtros" method="post">
+											<div class="row">
+												<div class='form-group mb-6' style="margin-left:8px">
+													<label>Filtros:</label>
+													<br />
+													<!--- Listar todas as variaveis -->
+													<select name='variaveis[]' class="custom-select">
+														<option value='' selected>Variáveis</option>
+														<?php
+															foreach($variables as $t){
+																echo '<option value="'.$t.'"/>'.$t.'</option>';
+															}
+														?>
+													</select>
+													<select name='operadores[]' class="custom-select">
+														<option value='' selected>Operadores</option>
+														<option value='>'>Maior</option>
+														<option value='>='>Maior ou igual</option>
+														<option value='<'>Menor</option>
+														<option value='<='>Menor ou igual</option>
+														<option value='='>Igual</option>
+													</select>
+												</div>
+												<div class='form-group mb-3' style='padding-top:27px; margin-left:4px'>											
+													<input type="text" class="form-control" name="valores[]" placeholder="Valor" aria-label="Valor"/>
+												</div>
+												<div class='form-group mb-3' style='padding-top:30px; margin-left:4px' id="btnMaisFiltros">											
+													<button type="button" class="btn btn-primary btn-fill btn-sm" id="maisFiltros">Mais filtros</button>
+												</div>
+												<div class="clearfix"></div>
 											</div>
-											<div class='form-group mb-3' style='padding-top:27px; margin-left:4px'>											
-												<input type="text" class="form-control" name="valor" placeholder="Valor" aria-label="Valor"/>
+											<div id='extraOptions'></div>
+											<div class="row">
+												<div class="col-md-1 px-1" style="margin-left:4px">
+													<input type='hidden' id = 'inputContadorFiltros' name='inputContadorFiltros' />
+													<button type="submit" class="btn btn-info btn-fill">Refazer</button>
+													<br />
+													<br />
+													<br />
+												</div>
 											</div>
-											<div class='form-group mb-3' style='padding-top:30px; margin-left:4px' id="btnMaisFiltros">											
-												<button type="button" class="btn btn-primary btn-fill btn-sm" id="maisFiltros">Mais filtros</button>
-											</div>
-											<div class="clearfix"></div>
-									</div>
-
-									<?php 
-									for($i = 1; $i<50; $i++){
-										?>
-										
-										
-									<div class="row" id="areaMaisFiltros<?php echo $i; ?>" style="display:none">
-											<div class='form-group mb-6' style="margin-left:8px">
-												<label>+ Filtros:</label>
-												<br />
-												<select name='concatenador<?php echo $i; ?>' class="custom-select">
-													<option value='' selected>Operação</option>
-													<option value='AND'>E</option>
-													<option value='OR'>OU</option>
-												</select>
-												<select name='variaveis<?php echo $i; ?>' class="custom-select">
-													<option value='' selected>Variáveis</option>
-												<?php
-
-													foreach($resultvar as $rvar){
-													
-													$t = $rvar->get('v.name');
-													
-													echo '<option value="'.$t.'"/>'.$t.'</option>';
-												
-												}
-												?>
-												</select>
-												<select name='operadores<?php echo $i; ?>' class="custom-select">
-													<option value='' selected>Operadores</option>
-													<option value='>'>Maior</option>
-													<option value='>='>Maior ou igual</option>
-													<option value='<'>Menor</option>
-													<option value='<='>Menor ou igual</option>
-													<option value='='>Igual</option>
-												</select>
-											</div>
-											<div class='form-group mb-3' style='padding-top:27px; margin-left:4px'>											
-												<input type="text" class="form-control" name="valor<?php echo $i; ?>" placeholder="Valor" aria-label="Valor"/>
-											</div>
-																				
-											<div class="clearfix"></div>
-									</div>
-									<?php
-									}
-										if(isset($_POST['lat1'])){
-											for($i=1; $i<=$_POST['contador'];$i++){
-												echo "<input type='hidden' name='lat$i' value='".$_POST['lat'.$i]."'/>";
-												echo "<input type='hidden' name='lng$i' value='".$_POST['lng'.$i]."'/>";
-											}
-											echo "<input type='hidden' name='contador' value='".$_POST['contador']."'/>";
-
-										}	
-									?>
-									<div class="row">
-
-										<div class="col-md-1 px-1" style="margin-left:4px">
-												<input type='hidden' id = 'inputContadorFiltros' name='inputContadorFiltros' />
-												<button type="submit" class="btn btn-info btn-fill">Refazer</button>
-												<br />
-												<br />
-												<br />
-										</div>
 										</form>
 									</div>
 								</div>
@@ -358,7 +329,7 @@ $(document).ready(function(){
 
 												<?php
 												if(isset($_POST['lat1'])){
-													for($i=1; $i<=$_POST['contador'];$i++){
+													for($i=1; $i<=count($data);$i++){
 														echo "<input type='hidden' name='lat$i' value='".$_POST['lat'.$i]."'/>";
 														echo "<input type='hidden' name='lng$i' value='".$_POST['lng'.$i]."'/>";
 													}

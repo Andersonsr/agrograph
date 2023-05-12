@@ -56,9 +56,7 @@ services:
       - "8000:8000"
     depends_on:
       - "neo4j"
-    command:
-      - git -C agrograph-api/ pull 
-      - python agrograph-api/manage.py runserver 0.0.0.0:8000
+    command: python agrograph-api/manage.py runserver 0.0.0.0:8000
 networks:
   default:
     driver: bridge

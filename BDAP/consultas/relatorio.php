@@ -1,8 +1,6 @@
 <?php
     include_once '../sessioncheck.php';
 	include_once '../connect.php';
-	
-	$result = $client->run($_SESSION['query']);
 ?>
 
 
