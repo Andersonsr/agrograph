@@ -15,8 +15,6 @@ include_once '../connect.php';
  Licensed under MIT (https://github.com/creativetimofficial/light-bootstrap-dashboard/blob/master/LICENSE)
 
  Coded by Creative Tim
-
-
 =========================================================
 
  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  -->
@@ -67,21 +65,36 @@ else {
 	$data = $_SESSION['data'];
 }
 
+$dict = array();
 for($i = 0; $i < count($data); $i++){
-
 	if(!in_array($data[$i]->variable, $variables)){
 		array_push($variables, $data[$i]->variable);
 	}
+	// se o ponto ja existe adiciona o conteudo ao conteudo existente se nao cria um novo ponto 
+	$conteudo = $data[$i]->variable . ': '. $data[$i]->value .' ('. $data[$i]->date . ")<br>";
+	$key = $data[$i]->latitude." ".$data[$i]->longitude;
 
-    $conteudo = $data[$i]->variable . ': '. $data[$i]->value .' ('. $data[$i]->date . ') </br>';
+    if (array_key_exists($key,  $dict)){
+		$dict[$key]['conteudo'] .= $conteudo; 
+	}
+	else{
+		$newObj = array(
+			'latitude' => $data[$i]->latitude,
+			'longitude' => $data[$i]->longitude,
+			'conteudo' => $conteudo, 	
+		);
+		$dict += [$key => $newObj];
+	}
+}
+$i = 0;
+foreach($dict as $d){
 	echo "
 	<script>
 	// Multiple Markers
     markers.push([
-        'Ponto$i', ".$data[$i]->latitude.", ".$data[$i]->longitude.", '$conteudo'
-    ]);</script>";
+        'Ponto$i', ".$d['latitude'].", ".$d['longitude'].", '" .$d['conteudo']."']);</script>";
+	$i++;
 }
-
 
 ?>
 
@@ -146,7 +159,7 @@ function initialize() {
         '<h3>'+markers[i][0]+'</h3>' +
         '<p>'+markers[i][3]+'</p></div>';
 		infoWindowContent.push([teste]);
-      } 
+    } 
     // Display multiple markers on a map
     var infoWindow = new google.maps.InfoWindow(), marker, i;
     
