@@ -1,7 +1,8 @@
 <?php
 include_once '../sessioncheck.php';
 include_once '../connect.php';
-print_r($_POST);
+// print_r($_POST);
+// print_r($_SESSION);
 ?>
 
 <!--
@@ -33,10 +34,41 @@ var markers = [];
 // print_r($_POST);
 // print_r($_SESSION);
 $email = $_SESSION["email"];
-$data = $_SESSION['data'];
+$data = [];
 $variables = [];
 
+$funcdict = array(
+	'>' => function($value1, $value2){return $value1 > $value2;},
+	'<' => function($value1, $value2){return $value1 < $value2;},
+	'=' => function($value1, $value2){return $value1 == $value2;},
+	'>=' => function($value1, $value2){return $value1 >= $value2;},
+	'<=' => function($value1, $value2){return $value1 <= $value2;}
+);
+
+if(isset($_POST['variaveis'])){
+	foreach($_SESSION['data'] as $e){
+		// echo('oi');
+		$ok = true;
+		for($i=0; $i<count($_POST['variaveis']); $i++){
+			if($e->variable == $_POST['variaveis'][$i]){
+				if($funcdict[$_POST['operadores'][$i]]($e->value, $_POST['valores'][$i])){
+					continue;
+				}
+				$ok = false;
+				break;
+			}		
+		}
+		if($ok){
+			array_push($data, $e);
+		}
+	}
+}
+else {
+	$data = $_SESSION['data'];
+}
+
 for($i = 0; $i < count($data); $i++){
+
 	if(!in_array($data[$i]->variable, $variables)){
 		array_push($variables, $data[$i]->variable);
 	}
@@ -83,6 +115,7 @@ for($i = 0; $i < count($data); $i++){
 	.form-control{width:170px;}
 	</style>
 	<script>
+
 jQuery(function($) {
     // Asynchronously Load the map API 
     var script = document.createElement('script');
@@ -144,24 +177,17 @@ $(document).ready(function(){
 	$("#maisFiltros").click(function(){
 		let div = document.createElement('div');
 		div.innerHTML = 
-		`<div class="row">
+		`
+		<label>+ Filtros:</label>
+		<div class="row">
 			<div class='form-group mb-6' style="margin-left:8px">
-				<label>+ Filtros:</label>
-				<br />
-				<select name='concatenadores[]' class="custom-select">
-					<option value='' selected>Operação</option>
-					<option value='AND'>E</option>
-					<option value='OR'>OU</option>
-				</select>
 				<select name='variaveis[]' class="custom-select">
 					<option value='' selected>Variáveis</option>
-				<?php
-
-					foreach($variables as $t){
-						echo '<option value="'.$t.'"/>'.$t.'</option>';
-					
-					}
-				?>
+						<?php
+							foreach($variables as $t){
+								echo '<option value="'.$t.'"/>'.$t.'</option>';
+							}
+						?>
 				</select>
 				<select name='operadores[]' class="custom-select">
 					<option value='' selected>Operadores</option>
@@ -172,13 +198,19 @@ $(document).ready(function(){
 					<option value='='>Igual</option>
 				</select>
 			</div>
-			<div class='form-group mb-3' style='padding-top:27px; margin-left:4px'>											
+			<div class='form-group mb-3' style='margin-left:4px'>											
 				<input type="text" class="form-control" name="valores[]" placeholder="Valor" aria-label="Valor"/>
 			</div>
 												
 			<div class="clearfix"></div>
 		</div>`;
 		// console.log('oi');
+		// <select name='concatenadores[]' class="custom-select">
+		// 	<option value='' selected>Operação</option>
+		// 	<option value='AND'>E</option>
+		// 	<option value='OR'>OU</option>
+		// </select>
+		
 		document.getElementById('extraOptions').appendChild(div);
 	});
 
@@ -263,10 +295,11 @@ $(document).ready(function(){
                                 <div class="card-body">
                                     <div id="filtros" class="collapse">
 										<form action="apresentaConsulta.php?filtros" method="post">
+											<label>Filtros:</label>
 											<div class="row">
 												<div class='form-group mb-6' style="margin-left:8px">
-													<label>Filtros:</label>
-													<br />
+													<!-- <label>Filtros:</label>
+													<br /> -->
 													<!--- Listar todas as variaveis -->
 													<select name='variaveis[]' class="custom-select">
 														<option value='' selected>Variáveis</option>
@@ -285,10 +318,10 @@ $(document).ready(function(){
 														<option value='='>Igual</option>
 													</select>
 												</div>
-												<div class='form-group mb-3' style='padding-top:27px; margin-left:4px'>											
+												<div class='form-group mb-3' style='margin-left:4px'>											
 													<input type="text" class="form-control" name="valores[]" placeholder="Valor" aria-label="Valor"/>
 												</div>
-												<div class='form-group mb-3' style='padding-top:30px; margin-left:4px' id="btnMaisFiltros">											
+												<div class='form-group mb-3' style='margin-left:4px' id="btnMaisFiltros">											
 													<button type="button" class="btn btn-primary btn-fill btn-sm" id="maisFiltros">Mais filtros</button>
 												</div>
 												<div class="clearfix"></div>
@@ -296,8 +329,7 @@ $(document).ready(function(){
 											<div id='extraOptions'></div>
 											<div class="row">
 												<div class="col-md-1 px-1" style="margin-left:4px">
-													<input type='hidden' id = 'inputContadorFiltros' name='inputContadorFiltros' />
-													<button type="submit" class="btn btn-info btn-fill">Refazer</button>
+													<button type="submit" class="btn btn-info btn-fill">Aplicar Filtros</button>
 													<br />
 													<br />
 													<br />
@@ -324,23 +356,10 @@ $(document).ready(function(){
 										<div class="col-md-10 text-right">
 											<br/>
 											<form action="relatorio.php" method="post">
-												<input type="hidden" name="inicio" value="<?php echo $_POST['inicio'];?>"/>
-												<input type="hidden" name="fim" value="<?php echo $_POST['fim'];?>"/>
-
+												
 												<?php
-												if(isset($_POST['lat1'])){
-													for($i=1; $i<=count($data);$i++){
-														echo "<input type='hidden' name='lat$i' value='".$_POST['lat'.$i]."'/>";
-														echo "<input type='hidden' name='lng$i' value='".$_POST['lng'.$i]."'/>";
-													}
-													echo "<input type='hidden' name='contador' value='".$_POST['contador']."'/>";
-
-												}	
-													if(isset($_POST['um']))
-														echo "<input type='hidden' name='um' value='um'/>";
-													if(isset($_POST['dois']))
-														echo "<input type='hidden' name='dois' value='dois'/>";
-
+													$json = json_encode($data);
+													echo "<input type='hidden' name='data' value='$json'/>";
 												?>
 												<button type="submit" class="btn btn-secondary btn-fill btn-sm ">Gerar relatório</button>
 											</form>

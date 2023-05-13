@@ -1,6 +1,7 @@
 <?php
     include_once '../sessioncheck.php';
 	include_once '../connect.php';
+    // print_r($_POST);
 ?>
 
 
@@ -127,19 +128,16 @@
 												</thead>
 												<tbody>
 												<?php
+                                                    $result = json_decode($_POST['data']);
                                                     $i=1;	
                                                     foreach($result as $r){
-                                                    $latbd = $r->get('node.latitude');
-                                                    $longbd = $r->get('node.longitude');
-                                                    echo "<tr><td>". $i."</td>";
-                                                    echo "<td>".$latbd."</td>";
-                                                    echo "<td>".$longbd."</td>";
-
-                                                        $data = explode("-", $r->get('d.date'));
-                                                        echo "<td>".$data[2].'/'.$data[1].'/'.$data[0]."</td>";
-                                                        echo '<td>'.$r->get('m.time').'</td>';
-                                                        echo "<td>".$r->get('v.name')."</td>";
-                                                        echo "<td>".$r->get('v.value')."</td></tr>";
+                                                        echo "<tr><td>". $i."</td>";
+                                                        echo "<td>".$r->latitude."</td>";
+                                                        echo "<td>".$r->longitude."</td>";
+                                                        echo "<td>".$r->date."</td>";
+                                                        echo '<td>'.$r->time.'</td>';
+                                                        echo "<td>".$r->variable."</td>";
+                                                        echo "<td>".$r->value."</td></tr>";
                                                         $i++;
 
                                                     }		
