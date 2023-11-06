@@ -17,6 +17,7 @@ RUN pip install django
 RUN pip install djangorestframework
 RUN pip install neomodel
 RUN pip install python-dotenv
+RUN pip install pyjwt
 RUN pip install django_neomodel
 RUN pip install shapely
 RUN pip install django-cors-headers

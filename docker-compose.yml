@@ -28,7 +28,7 @@ services:
     volumes:
       - "./neo4j/data:/data"
       - "./neo4j/logs:/logs"
-    
+
   php:
     environment:
       - NEO4J_HOST=${NEO4J_HOST:-localhost}

@@ -2,6 +2,9 @@
     include_once '../sessioncheck.php';
 	include_once '../connect.php';
     // print_r($_SESSION);
+    use Firebase\JWT\JWT;
+    use Firebase\JWT\Key;
+
     
 ?>
 <!--
@@ -54,10 +57,10 @@
 
 	</style>
 	<script>
+    
         $(document).ready(function() {
             $('#formulario').submit(function(e) {
                 let datos = $("#formulario").serialize();
-                
                 $.ajax({
                     type: "POST",
                     url: 'prepareRequest.php',
@@ -65,10 +68,11 @@
                     dataType: 'json',
                     success: function(response) {
                         // console.log(response);
+                        $jwt = JWT::encode($response, $_ENV['CROSS_SERVER_SECRET'], 'HS256');
                         $.ajax({
                             type: "GET",
                             url: 'http://localhost:8000/v1/measurements/',
-                            data: response,
+                            data: $jwt,
                             dataType: 'json',
                             success: function(response) {
                                 console.log(response);

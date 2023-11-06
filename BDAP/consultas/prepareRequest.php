@@ -33,6 +33,6 @@
         $payload += ['polygon' => $polygon];
     }
     $payload += ['authToken' => $_SESSION['token']]; 
-    $payload += ['cross_secret' => $_ENV['CROSS_SERVER_SECRET']];
+    // $payload += ['cross_secret' => $_ENV['CROSS_SERVER_SECRET']];
     echo json_encode($payload);
 ?>

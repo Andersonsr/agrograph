@@ -10,6 +10,8 @@ ENV CROSS_SERVER_SECRET=supersecret
 
 RUN apt-get update -y
 RUN apt-get install -y libpng-dev libzip-dev libonig-dev zlib1g-dev
+RUN apt-get install npm -y
+RUN npm install jsonwebtoken
 RUN docker-php-ext-install mbstring
 RUN docker-php-ext-install zip
 RUN docker-php-ext-install gd
